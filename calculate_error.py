@@ -2,11 +2,20 @@ import theano.tensor as T
 from theano import function
 import numpy as np
 
-def calculate_error(error_func, label_48, vy_48):
-	vlabel = np.zeros(48)
-	vlabel[label_48] = 1
-	err, errd = error_func(vlabel, vy_48)
-	return err, errd
+def calculate_error(phoneme_num, label_48_list, vy_48_list, labelmap, error_func):
+	batch_size = len(label_48_list)
+	
+	err_total = 0
+	errd_total = np.zeros(phoneme_num)
+	for i in range(batch_size):
+		label_idx = labelmap[label_48_list[i]]
+		vlabel = np.zeros(phoneme_num)
+		vlabel[label_idx] = 1
+
+		err, errd = error_func(vlabel, vy_48_list[i])
+		err_total += err
+		errd_total += errd
+	return (err_total / batch_size), (errd_total / batch_size)
 
 def error_func_norm2(v1, v2):
 	x = T.fvector('x')
@@ -42,15 +51,19 @@ def main():
 	print 'test calculate_error'
 
 	labelmap = read_label_map('train.lab', '48_39.map')
-	y_48 = np.random.random(48)
-	label = 'maeb0_si1411_3'
+	y_48s = [np.random.random(48),
+			 np.random.random(48),
+			 np.random.random(48)]
+	labels = ['maeb0_si1411_1',
+			  'maeb0_si1411_2',
+			  'maeb0_si1411_3']
 
 	# print 'y_48:' + str(y_48)
 	# print 'label_1943:' + str(label)
 	# print 'labelmap:' + str(labelmap)
 
 	print 'start'
-	err, errd = calculate_error(error_func_norm2, labelmap[label], y_48)
+	err, errd = calculate_error(48, labels, y_48s, labelmap, error_func_norm2)
 	print err
 	print errd
 	print 'end'
