@@ -1,7 +1,7 @@
 import sys
-#from forward import *           # init(), forward()
-#from calculate_error import *   # read_label_map(), calculate_error()
-#from backprop import *          # backpropagation()
+from forward import *           # init(), forward()
+from calculate_error import *   # read_label_map(), calculate_error()
+from backpro import *          # backpropagation()
 #from update import *            # update(), save_model()
 #from predict import *           # load_model()
 
@@ -17,8 +17,8 @@ phonemes = 48
 layer = int(sys.argv[1])
 neuron = []
 neuron.append(raw)
-for layer in range(layer):
-    neuron.append(int(sys.argv[2].split(',')[layer]))
+for l in range(layer):
+    neuron.append(int(sys.argv[2].split(',')[l]))
 neuron.append(phonemes)
 batch_size = int(sys.argv[3])
 iteration = int(sys.argv[4])
@@ -26,17 +26,26 @@ learning_rate = int(sys.argv[5])
 
 # Path setting
 train_label_file = 'MLDS_HW1_RELEASE_v1/label/train.lab'
-48_39_map_file = 'MLDS_HW1_RELEASE_v1/phones/48_39.map'
+map_48_39_file = 'MLDS_HW1_RELEASE_v1/phones/48_39.map'
+features_file = 'MLDS_HW1_RELEASE_v1/mfcc/train_300.ark'
 
-W, B = init(layer, neuron)
+w_and_b = init(layer, neuron)
+label_map = read_label_map(train_label_file, map_48_39_file)
+
 print 'Start Training...'
 for i in range(iteration):
     print 'iteration: ', i
-    speech_id, Y = forward(W, B, layer, batch_size)
-    label_map = read_label_map(train_label_file, 48_39_map_file)
-    err, gradC = calculate_error(phonemes, speech_id, Y, label_map, error_func_norm2)
-    print 'err: '
-    C = backprop(gradC, layer)
+    
+    all_speech_ids, all_features = read_file(features_file)
+    speech_ids, features, a_list, z_list = forward(all_features, all_speech_ids, w_and_b, batch_size, False)
+    
+    y_list = [z[-1] for z in z_list]
+    err, gradC = calculate_error(phonemes, speech_ids, y_list, label_map, error_func_norm2)
+    
+    print 'err: ' + str(err)
+    print 'gradC: ' + str(gradC)
+    
+    C = backpropagate(gradC, z_list, a_list, layer, w_and_b, features)
     update(learning_rate, C, layer, i)
     print '------------------------------------'
 

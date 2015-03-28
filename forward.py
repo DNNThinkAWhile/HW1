@@ -17,7 +17,7 @@ r = T.dvector('r')
 s = T.dot(p,q) + r 
 f_matrix_dot = function( [p,q,r] , s)
 
-t = T.dmatrix('t')
+t = T.dvector('t')
 u = T.nnet.sigmoid(t)
 f_sigmoid = function([t],u)
 
@@ -31,6 +31,11 @@ def init(layer,neuron):
    MFCC_DIM = neuron[0]
    NEURON_NUM = neuron[1]
    PHONE_NUM = neuron[layer]
+   # print 'layer:' + str(layer)
+   # print 'neuron:' + str(neuron)
+   # print 'MFCC_DIM:' + str(MFCC_DIM)
+   # print 'NEURON_NUM:' + str(NEURON_NUM)
+   # print 'PHONE_NUM:' + str(PHONE_NUM)
 
    w1 = np.random.uniform(w_Min,w_Max,(NEURON_NUM,MFCC_DIM))
    b1 = np.random.uniform(w_Min,w_Max,(NEURON_NUM))
@@ -51,7 +56,7 @@ def init(layer,neuron):
    rList.append(w_List);
    rList.append(b_List);
    
-   return r_List
+   return rList
 
 
 def read_file(filePath):
@@ -105,6 +110,7 @@ def forward(List2D_MFCC_data, List_speakID, WandB, BATCH_SIZE, isTest):
          temp_a_List.append(z_layer)
          z_layer = f_sigmoid(z_layer)
          temp_z_List.append(z_layer)
+         
 #      y_List.append(z_layer)
       a_List.append(temp_a_List)
       z_List.append(temp_z_List)      
@@ -121,7 +127,9 @@ def forward(List2D_MFCC_data, List_speakID, WandB, BATCH_SIZE, isTest):
 #   for i in range(0,len(a_List),1):
 #      print(a_List[i].shape)
 
-   return (OneTime_train_speechID, OneTime_train_set , a_List[i], z_List[i])
+   
+
+   return (OneTime_train_speechID, OneTime_train_set , a_List, z_List)
 
 
 
@@ -129,9 +137,9 @@ def forward(List2D_MFCC_data, List_speakID, WandB, BATCH_SIZE, isTest):
 
 
 def main():
-   init(0,0)
+   init(2,[3, 5, 6])
    forward()
-   
+
    MFCC_DIM = 39
    LAYER_NUM = 5
    NEURON_NUM = 100
