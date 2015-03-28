@@ -10,6 +10,9 @@ def backpropagate (gradC = np.zeros(1) , z  = [],  a = [] , layer = 0, theta = [
     WC = []
     lum = []
     WT = []
+    W = theta[0]
+    b = theta[1]
+    L = layer
     if len(z) != len(W) or len(a) != len(b) or len(W) != L or len(b) != L :
         print "Error List Size"
         return
