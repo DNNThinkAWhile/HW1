@@ -6,7 +6,7 @@ import numpy as np
 def sig (x):
     return 1 / (1 + np.exp(-x))
 
-def backpropagate (gradC = np.zeros(1) , z  = [],  a = [] , layer = 0, theta = [], featureset = []):
+def backpropagate (gradC = np.zeros(1) , z  = [][],  a = [][] , layer = 0, theta = [], featureset = []):
     C = []
     WC = []
     lum = []
