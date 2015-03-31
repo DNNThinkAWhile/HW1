@@ -45,7 +45,9 @@ for i in range(iteration):
     print 'err: ' + str(err)
     print 'gradC: ' + str(gradC)
     
-    C = backpropagate(gradC, z_list, a_list, layer, w_and_b, features)
+    print a_list
+
+    C = backpropagate(gradC, z_list, a_list, layer, w_and_b, features, batch_size)
     update(learning_rate, C, layer, i)
     print '------------------------------------'
 
