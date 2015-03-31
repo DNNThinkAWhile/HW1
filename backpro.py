@@ -40,10 +40,11 @@ def backpropagate (gradC = np.zeros(1) , z  = [],  a = [] , layer = 0, theta = [
 					C[(layer - 1 - i) * 2] = C[(layer - 1 - i) * 2] + WC[i]
 					C[(layer - 1 - i) * 2 + 1] = C[(layer - 1 - i) * 2 + 1] + lum[i]
 			else:
-				print 'wt len ' + str(len(WT))
-				print 'lum len ' + str(len(lum))
+				print 'sigz shape ' + str(sig(z[j][i]).shape)
+				print 'wt shape ' + str(WT[i+1].shape)
+				print 'lum shape ' + str(lum[i - 1].shape)
 				print 'i=' + str(i)
-				lum.append(sig(z[j][i])*WT[i]*lum[i - 1])
+				lum.append( (sig(z[j][i]) * WT[i + 1].transpose() ).transpose().dot(lum[i - 1]) )
 				if i != 0 :
 					WC.append(a[j][i]*lum[layer - 1 - i])
 				else :
