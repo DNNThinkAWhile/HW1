@@ -17,8 +17,8 @@ def backpropagate (gradC = np.zeros(1) , z  = [],  a = [] , layer = 0, theta = [
 	for i in range(len(W)):
 		WT.append(np.transpose(W[i]))
 
-	print 'W len=' + str(len(W))
-	print 'WT len=' + str(len(WT))
+	# print 'W len=' + str(len(W))
+	# print 'WT len=' + str(len(WT))
 
 	for j in range(batchsize):
 		WC = [None] * (layer + 1)
@@ -31,21 +31,23 @@ def backpropagate (gradC = np.zeros(1) , z  = [],  a = [] , layer = 0, theta = [
 				else :
 					WC[i] = featureset[j] * lum[i]
 				if j == 0:
-					print 'i=' + str(i) 
+					#print 'i=' + str(i) 
 					C.append(WC[i])
 					C.append(lum[i])
 				else:
 					C[(layer  - i) * 2] = C[(layer  - i) * 2] + WC[i]
 					C[(layer  - i) * 2 + 1] = C[(layer  - i) * 2 + 1] + lum[i]
 			else:
-				print 'sigz shape ' + str(sig(z[j][i]).shape)
-				print 'wt shape ' + str(WT[i+1].shape)
-				print 'lum shape ' + str(lum[i - 1].shape)
-				print 'i=' + str(i)
-				lum[i] =  (sig(z[j][i - 1]) * WT[i].transpose() ).transpose().dot(lum[i ]) 
+				# print 'sigz shape ' + str(sig(z[j][i]).shape)
+				# print 'wt shape ' + str(WT[i+1].shape)
+				# print 'lum shape ' + str(lum[i - 1].shape)
+				#print 'i=' + str(i)
+				
 				if i != 0 :
+					lum[i] =  (sig(z[j][i - 1]) * WT[i].transpose() ).transpose().dot(lum[i+1]) 
 					WC[i] = a[j][i - 1]*lum[i]
 				else :
+					lum[i] =  ( featureset[j] * WT[i].transpose() ).transpose().dot(lum[i+1]) 
 					WC[i] = featureset[j] * lum[i]
 				if j == 0 :
 					C.append(WC[i])
