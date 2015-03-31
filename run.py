@@ -22,12 +22,12 @@ for l in range(layer):
 neuron.append(phonemes)
 batch_size = int(sys.argv[3])
 iteration = int(sys.argv[4])
-learning_rate = int(sys.argv[5])
+learning_rate = float(sys.argv[5])
 
 # Path setting
 train_label_file = 'MLDS_HW1_RELEASE_v1/label/train.lab'
 map_48_39_file = 'MLDS_HW1_RELEASE_v1/phones/48_39.map'
-features_file = 'MLDS_HW1_RELEASE_v1/mfcc/train_300.ark'
+features_file = 'MLDS_HW1_RELEASE_v1/mfcc/train.ark'
 
 w_and_b = init(layer, neuron)
 label_map = read_label_map(train_label_file, map_48_39_file)
@@ -39,7 +39,7 @@ for i in range(iteration):
     all_speech_ids, all_features = read_file(features_file)
     speech_ids, features, a_list, z_list = forward(all_features, all_speech_ids, w_and_b, batch_size, False)
     
-    y_list = [z[-1] for z in z_list]
+    y_list = [a[-1] for a in a_list]
     err, gradC = calculate_error(phonemes, speech_ids, y_list, label_map, error_func_norm2)
     
     print 'err: ' + str(err)
