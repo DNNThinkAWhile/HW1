@@ -21,43 +21,41 @@ def backpropagate (gradC = np.zeros(1) , z  = [],  a = [] , layer = 0, theta = [
 	print 'WT len=' + str(len(WT))
 
 	for j in range(batchsize):
-		WC = []
-		lum = []
-		for i in range(layer - 1, -1, -1):
-			if i == layer - 1 :
-				lum.append(sig(z[j][i])*gradC)
+		WC = [None] * (layer + 1)
+		lum = [None] * (layer + 1)
+		for i in range(layer , -1, -1):
+			if i == layer :
+				lum[i] = sig(z[j][i - 1])*gradC
 				if i != 0 :
-					print 'a:' + str(a[j][i - 1])
-					print 'lum:' + str(lum[layer - 1 - i])
-					WC.append(a[j][i]*lum[layer - 1 - i])
+					WC[i] = a[j][i - 1]*lum[i]
 				else :
-					WC.append(featureset[j] * lum[layer - 1 - i])
+					WC[i] = featureset[j] * lum[i]
 				if j == 0:
 					print 'i=' + str(i) 
-					C.append(WC[layer - 1 - i])
-					C.append(lum[layer - 1 - i])
+					C.append(WC[i])
+					C.append(lum[i])
 				else:
-					C[(layer - 1 - i) * 2] = C[(layer - 1 - i) * 2] + WC[i]
-					C[(layer - 1 - i) * 2 + 1] = C[(layer - 1 - i) * 2 + 1] + lum[i]
+					C[(layer  - i) * 2] = C[(layer  - i) * 2] + WC[i]
+					C[(layer  - i) * 2 + 1] = C[(layer  - i) * 2 + 1] + lum[i]
 			else:
 				print 'sigz shape ' + str(sig(z[j][i]).shape)
 				print 'wt shape ' + str(WT[i+1].shape)
 				print 'lum shape ' + str(lum[i - 1].shape)
 				print 'i=' + str(i)
-				lum.append( (sig(z[j][i]) * WT[i + 1].transpose() ).transpose().dot(lum[i - 1]) )
+				lum[i] =  (sig(z[j][i - 1]) * WT[i].transpose() ).transpose().dot(lum[i ]) 
 				if i != 0 :
-					WC.append(a[j][i]*lum[layer - 1 - i])
+					WC[i] = a[j][i - 1]*lum[i]
 				else :
-					WC.append(featureset[j] * lum[layer - 1 - i])
+					WC[i] = featureset[j] * lum[i]
 				if j == 0 :
-					C.append(WC[layer - 1 - i])
-					C.append(lum[layer - 1 - i])
+					C.append(WC[i])
+					C.append(lum[i])
 				else:
-					C[(layer - 1 - i) * 2] = C[(layer - 1 - i) * 2] + WC[i]
-					C[(layer - 1 - i) * 2 + 1] = C[(layer - 1 - i) * 2 + 1] + lum[i]
+					C[(layer  - i) * 2] = C[(layer  - i) * 2] + WC[i]
+					C[(layer  - i) * 2 + 1] = C[(layer  - i) * 2 + 1] + lum[i]
 
 
-	for i in range(layer - 1):
+	for i in range(layer ):
 		C[2*i] = C[2*i] / batchsize
 		C[2*i + 1] = C[2*i + 1] / batchsize
 
