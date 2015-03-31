@@ -23,11 +23,11 @@ def predict(test_file_path, theta):
     return speech_id, Y
 
 def main():
-    if ( len(sys.argv) != 2 )
+    if ( len(sys.argv) != 2 ) :
         print 'predict <model_id>'
         quit()
     
-    load_model_path = 'model_' + str(sys.argv[1])
+    load_model_path = 'model_' + str(sys.argv[1]) + '.npy'
     theta = load_model(load_model_path)
     test_file_path = 'MLDS_HW1_RELEASE_v1/mfcc/test.ark'
     speech_id, Y = predict(test_file_path, theta)

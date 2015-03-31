@@ -2,7 +2,7 @@ import sys
 from forward import *           # init(), forward()
 from calculate_error import *   # read_label_map(), calculate_error()
 from backpro import *          # backpropagation()
-#from update import *            # update(), save_model()
+from update import *            # update(), save_model()
 #from predict import *           # load_model()
 
 if( len(sys.argv) != 6 ) :
@@ -48,7 +48,7 @@ for i in range(iteration):
     print a_list
 
     C = backpropagate(gradC, z_list, a_list, layer, w_and_b, features, batch_size)
-    update(learning_rate, C, layer, i)
+    update(learning_rate, w_and_b[0], w_and_b[1], C, layer, i)
     print '------------------------------------'
 
 
