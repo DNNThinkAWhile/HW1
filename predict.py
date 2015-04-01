@@ -11,16 +11,20 @@ def predict_outfile(speech_id, Y):
     outfile_path = 'solution.csv'
     with open(outfile_path, 'w') as csvfile:
         writer = csv.writer(csvfile)
-        for idx in len(Y):
+        for idx in range(len(Y)):
             sol = str(speech_id[idx]) + ',' + str(Y[idx])
             writer.writerow(sol)
 
 def predict(test_file_path, theta):
     speech_id, mfcc_data = read_file(test_file_path)
-    selected_speech_id, feature_set, Y = forward(mfcc_data, speech_id, theta, batch_size, 1)
-    if speech_id != selected_speech_id:
-        print 'warning! debug!'
-    return speech_id, Y
+    y_list = [];
+    for i in range(len(speech_id)):
+        selected_speech_id, feature_set, a_list, z_list = forward(mfcc_data[i], speech_id[i], theta, 1, True)
+        y = a_list[0][-1]
+        y_list.append(y)
+        # if speech_id != selected_speech_id:
+        #     print 'warning! debug!'
+    return speech_id, y_list
 
 def main():
     if ( len(sys.argv) != 2 ) :
