@@ -17,7 +17,7 @@ phonemes = 48
 layer = int(sys.argv[1])
 neuron = []
 neuron.append(raw)
-for l in range(layer):
+for l in range(layer-1):
     neuron.append(int(sys.argv[2].split(',')[l]))
 neuron.append(phonemes)
 batch_size = int(sys.argv[3])

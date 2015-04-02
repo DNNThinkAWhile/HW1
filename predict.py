@@ -17,9 +17,10 @@ def predict_outfile(speech_id, Y):
 
 def predict(test_file_path, theta):
     speech_id, mfcc_data = read_file(test_file_path)
-    selected_speech_id, feature_set, Y = forward(mfcc_data, speech_id, theta, batch_size, 1)
+    selected_speech_id, feature_set, a_List, z_List = forward(mfcc_data, speech_id, theta, batch_size, 1)
     if speech_id != selected_speech_id:
         print 'warning! debug!'
+    Y = a_List[0][-1]
     return speech_id, Y
 
 def main():
