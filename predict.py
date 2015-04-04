@@ -4,17 +4,26 @@ import csv
 from forward import *
 
 def load_model(load_model_path):
-	theta = np.load(load_model_path)
-	return theta
+   theta = np.load(load_model_path)
+   return theta
 
 def predict_outfile(speech_id, Y):
-	outfile_path = 'solution.csv'
-	with open(outfile_path, 'w') as csvfile:
-		writer = csv.writer(csvfile)
-		for idx in range(len(Y)):
-			sol = [str(speech_id[idx]), str(Y[idx])]
-			writer.writerow(sol)
+   outfile_path = 'solution.csv'
+   with open(outfile_path, 'w') as csvfile:
+      writer = csv.writer(csvfile)
+      for idx in range(len(Y)):
+         sol = [str(speech_id[idx]), str(Y[idx])]
+         writer.writerow(sol)
 
+<<<<<<< HEAD
+def predict(test_file_path, theta):
+    speech_id, mfcc_data = read_file(test_file_path)
+    selected_speech_id, feature_set, a_List, z_List = forward(mfcc_data, speech_id, theta, batch_size, 1)
+    if speech_id != selected_speech_id:
+        print 'warning! debug!'
+    Y = a_List[0][-1]
+    return speech_id, Y
+=======
 def predict(test_file_path, theta, sol_map):
 	print 'prediting...'
 	speech_id, mfcc_data = read_file(test_file_path)
@@ -44,6 +53,7 @@ def create_sol_map(map_48_39_file, labelnum):
 			sol_map[count] = label
 			count += 1
 	return sol_map
+>>>>>>> 7e6c6b1c6b5c2268c4a0a298ac4d834aedd47940
 
 def main():
 	if ( len(sys.argv) != 2 ) :

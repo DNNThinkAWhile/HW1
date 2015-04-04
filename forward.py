@@ -29,28 +29,29 @@ def init(layer,neuron):
    
    LAYER_NUM = layer;
    MFCC_DIM = neuron[0]
-   NEURON_NUM = neuron[1]
-   PHONE_NUM = neuron[layer]
+   NEURON_NUM = neuron[1:-1]
+   PHONE_NUM = neuron[-1]
    # print 'layer:' + str(layer)
    # print 'neuron:' + str(neuron)
    # print 'MFCC_DIM:' + str(MFCC_DIM)
    # print 'NEURON_NUM:' + str(NEURON_NUM)
    # print 'PHONE_NUM:' + str(PHONE_NUM)
 
-   w1 = np.random.uniform(w_Min,w_Max,(NEURON_NUM,MFCC_DIM))
-   b1 = np.random.uniform(w_Min,w_Max,(NEURON_NUM))
+   w1 = np.random.uniform(w_Min,w_Max,(NEURON_NUM[0],MFCC_DIM))
+   b1 = np.random.uniform(w_Min,w_Max,(NEURON_NUM[0]))
    w_List.append(w1);
    b_List.append(b1);
-   
-   for i in range(1,LAYER_NUM,1):
-      if i == LAYER_NUM - 1:
-         w_i = np.random.uniform(w_Min,w_Max,(PHONE_NUM,NEURON_NUM))
+   idx = 0
+   for iNeuron in NEURON_NUM:
+      if iNeuron == NEURON_NUM[-1]:
+         w_i = np.random.uniform(w_Min,w_Max,(PHONE_NUM,iNeuron))
          b_i = np.random.uniform(w_Min,w_Max,(PHONE_NUM))
       else:
-         w_i = np.random.uniform(w_Min,w_Max,(NEURON_NUM,NEURON_NUM))
-         b_i = np.random.uniform(w_Min,w_Max,(NEURON_NUM))
+         w_i = np.random.uniform(w_Min,w_Max,(NEURON_NUM[idx+1],NEURON_NUM[idx]))
+         b_i = np.random.uniform(w_Min,w_Max,(NEURON_NUM[idx+1]))
       w_List.append(w_i)
       b_List.append(b_i)
+      idx += 1
    
    rList = []
    rList.append(w_List);
@@ -98,8 +99,8 @@ def forward(List2D_MFCC_data, List_speakID, WandB, BATCH_SIZE, isTest):
          OneTime_train_set.append(arr)
          OneTime_train_speechID.append(List_speakID[idx])
    else:
-      OneTime_train_set = [np.asfarray(List2D_MFCC_data)]
-      OneTime_train_speechID = [List_speakID]
+      OneTime_train_set = List2D_MFCC_data
+      OneTime_train_speechID = List_speakID
 
    for array in OneTime_train_set:
       temp_a_List = []
