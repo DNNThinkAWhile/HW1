@@ -27,12 +27,15 @@ def error_func_norm2(v1, v2):
 	df = np.array(d, dtype = 'f')
 	return norm2(df), norm2d(df)
 
-def get_valid_answer(phonemes, speech_id, label_map, sol_map):
-    answer = []
+def get_answer(phonemes, speech_id, predict_y_labels, label_map, sol_map):
+    valid_answer = []
+    predict_answer = [] 
     for i in range(len(speech_id)):
         label_idx = label_map[speech_id[i]]
-        answer.append(sol_map[label_idx])
-    return answer
+        valid_answer.append(sol_map[label_idx])
+        label_idx = predict_y_labels[i].argmax(axis = 0)
+        predict_answer.append(sol_map[label_idx])
+    return valid_answer, predict_answer
 
 def print_fscore(v1, v2):
     match = 0

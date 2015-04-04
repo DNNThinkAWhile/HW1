@@ -71,6 +71,6 @@ for k in range(1, K+1):
     speech_ids, features, a_list, z_list = forward(cv_predict_features, cv_predict_speech_ids, w_and_b, len(cv_predict_speech_ids), True)
     #predict_speech_id, predict_y_labels = predict(cv_predict_feature_file, w_and_b, sol_map)
     predict_y_labels = [a[-1] for a in a_list]
-    valid_answer = get_valid_answer(phonemes, speech_ids, label_map, sol_map)
-    print_fscore(valid_answer, predict_y_labels) 
+    valid_answer, predict_answer = get_answer(phonemes, speech_ids, predict_y_labels, label_map, sol_map)
+    print_fscore(valid_answer, predict_answer) 
 
