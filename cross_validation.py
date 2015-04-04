@@ -5,6 +5,8 @@ from backpro import *           # backpropagation()
 from update import *            # update(), save_model()
 from predict import *           # load_model(), create_sol_map()
 
+TEST_NUM = 10000;
+
 # K-FOLD CROSS-VALIDATION 
 
 def cut_file(orig_data_path, K):
@@ -12,18 +14,33 @@ def cut_file(orig_data_path, K):
         orig_data = f.readlines()
     num_lines = sum(1 for line in orig_data)
     for k in range(K):
+        test_cnt = 0;
         train_outfile = open('train_data_'+str(k+1), 'w')
         test_outfile = open('test_data_'+str(k+1), 'w')
         for idx in range(num_lines):
             if idx%K==k:
                 train_outfile.write(orig_data[idx])
             else:
-                test_outfile.write(orig_data[idx])
+                if test_cnt < TEST_NUM:
+                    test_outfile.write(orig_data[idx])
+                    test_cnt += 1
 def score(speech_ids, y, label_map):
     tp = 0
     fp = 0
     fn = 0
     
+def test(test_file, w_and_b):
+    print 'testfile:' + test_file
+    predict_speech_ids, predict_features = read_file(test_file)
+    speech_ids, features, a_list, z_list = forward(predict_features, predict_speech_ids, w_and_b, len(predict_speech_ids), True)
+    #predict_speech_id, predict_y_labels = predict(cv_predict_feature_file, w_and_b, sol_map)
+    predict_y_labels = [a[-1] for a in a_list]
+    print predict_speech_ids
+    print 'asdfsdfasdfasfasdf'
+    print speech_ids
+    valid_answer, predict_answer = get_answer(phonemes, speech_ids, predict_y_labels, label_map, sol_map)
+    print_fscore(valid_answer, predict_answer) 
+
 if( len(sys.argv) != 7 ) :
     print '    cross_validation.py <layer> <# of neuron in each layer> <batch_size> <iteration> <learning_rate> <K-fold>'
     print 'ex. cross_validation 3 5,6 10 20 0.01 10'
@@ -66,11 +83,12 @@ for k in range(1, K+1):
         err, gradC = calculate_error(phonemes, speech_ids, y_list, label_map, error_func_norm2)
         C = backpropagate(gradC, z_list, a_list, layer, w_and_b, features, batch_size)
         w_and_b = update(learning_rate, w_and_b[0], w_and_b[1], C, i)
+        if i % 5 == 0 and i > 0:
+            test(cv_predict_feature_file, w_and_b)
     print '------------------------------------'
-    cv_predict_speech_ids, cv_predict_features = read_file(cv_predict_feature_file)
-    speech_ids, features, a_list, z_list = forward(cv_predict_features, cv_predict_speech_ids, w_and_b, len(cv_predict_speech_ids), True)
-    #predict_speech_id, predict_y_labels = predict(cv_predict_feature_file, w_and_b, sol_map)
-    predict_y_labels = [a[-1] for a in a_list]
-    valid_answer, predict_answer = get_answer(phonemes, speech_ids, predict_y_labels, label_map, sol_map)
-    print_fscore(valid_answer, predict_answer) 
+    # cv_predict_speech_ids, cv_predict_features = read_file(cv_predict_feature_file)
+    # speech_ids, features, a_list, z_list = forward(cv_predict_features, cv_predict_speech_ids, w_and_b, len(cv_predict_speech_ids), True)
+    # predict_y_labels = [a[-1] for a in a_list]
+    # valid_answer, predict_answer = get_answer(phonemes, speech_ids, predict_y_labels, label_map, sol_map)
+    # print_fscore(valid_answer, predict_answer) 
 
