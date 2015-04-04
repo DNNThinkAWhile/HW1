@@ -64,17 +64,15 @@ def read_file(filePath):
    List_speakID = []
    List2D_MFCC_data = []
    
-   MFCC_trainFile = open(filePath) 
-   while 1:
-      lines = MFCC_trainFile.readlines(10000)
-      if not lines:
-         break;
-      for line in lines:
-         partition = line.split()
-         List_speakID.append(partition[0])
-         List2D_MFCC_data.append(partition[1:])
+   with open(filePath, 'r') as f:
+       MFCC_trainFile = f.readlines()
+       num_lines = sum(1 for line in MFCC_trainFile)
+       for line in MFCC_trainFile:
+            partition = line.split()
+            List_speakID.append(partition[0])
+            List2D_MFCC_data.append(partition[1:])
 
-   MFCC_trainFile.close()
+   f.close()
    
    return (List_speakID, List2D_MFCC_data)
 
@@ -93,25 +91,22 @@ def forward(List2D_MFCC_data, List_speakID, WandB, BATCH_SIZE, isTest):
    OneTime_train_set = []
    OneTime_train_speechID = []
    if isTest == 0:
-      for i in range(0,BATCH_SIZE,1):
-         idx = (int)(random.random()*trainDataSetNum)
-         arr = np.asfarray(List2D_MFCC_data[idx])
-         OneTime_train_set.append(arr)
-         OneTime_train_speechID.append(List_speakID[idx])
+      for i in range(BATCH_SIZE):
+        idx = (int)(random.random()*trainDataSetNum)
+        arr = np.asfarray(List2D_MFCC_data[idx])
+        OneTime_train_set.append(arr)
+        OneTime_train_speechID.append(List_speakID[idx])
    else:
       for i in range(BATCH_SIZE):
-         arr = np.asfarray(List2D_MFCC_data[i])
-         OneTime_train_set.append(arr)
-         OneTime_train_speechID.append(List_speakID[i])
+        arr = np.asfarray(List2D_MFCC_data[i])
+        OneTime_train_set.append(arr)
+        OneTime_train_speechID.append(List_speakID[i])
 
    for array in OneTime_train_set:
       temp_a_List = []
       temp_z_List = []
       z_layer = array
       for layer in range(0,LAYER_NUM,1):
-         # print w_List
-         # print z_layer
-         # print b_List
          z_layer = f_matrix_dot( w_List[layer] , z_layer , b_List[layer])
          temp_z_List.append(z_layer)
          z_layer = f_sigmoid(z_layer)

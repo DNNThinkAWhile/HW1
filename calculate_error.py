@@ -35,33 +35,15 @@ def get_valid_answer(phonemes, speech_id, label_map, sol_map):
     return answer
 
 def print_fscore(v1, v2):
-    tp = 0
-    fp = 0
-    fn = 0
+    match = 0
     for n in range(len(v1)):
-        if v1[n] == 1:
-            if v1[n] == v2[n]:
-                tp += 1
-            else:
-                fn += 1
-        else:
-            fp += 1
-    tn = len(v1) - tp - fn - fp
-    recall = float(tp)/(tp+fn)
-    precision = float(tp)/(tp+fp)
-    f_score = 2*precision*recall/(precision+recall)
+        if v1[n] == v2[n]:
+            match += 1
+    accuracy = match/len(v1)*100.0
     print_file = '''
+    Accuracy:  {a} % ({match}/{total})
     ==========================================
-                              answer
-                         1               0
-    predict   1         {tp}            {fp} 
-              0         {fn}            {tn}
-    
-    recall: {recall}
-    precision: {precision}
-    F-score:  {f_score}
-    ==========================================
-    '''.format(tp=tp, fp=fp, fn=fn, tn=tn, recall=recall, precision=precision, f_score=f_score)
+    '''.format(a = accuracy, match = match, total = len(v1))
     print print_file
 
 def read_label_map(file_label, file_48_39):

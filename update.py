@@ -5,25 +5,6 @@ def save_model(theta, iteration):
     save_model_path = 'model_' + str(iteration)
     np.save(save_model_path, theta)
 
-# def init(layer, neuron):
-#     W = []
-#     B = []
-#     C1 = []
-#     C2 = []
-#     C = []
-#     for l in range(layer):
-#         w = np.random.rand(neuron[l], neuron[l+1])
-#         c1 = np.random.rand(neuron[layer-l-1], neuron[layer-l])
-#         b = np.random.rand(neuron[l+1])
-#         c2 = np.random.rand(neuron[layer-l])
-#         W.append(w)
-#         C1.append(c1)
-#         B.append(b)
-#         C2.append(c2)
-#     C.append(C1)
-#     C.append(C2)
-#     return W, B, C
-
 def update(learning_rate, W, B, C, iteration):
     layer = len(W)
     for l in range(layer):
@@ -57,7 +38,7 @@ def main():
     neuron = [raw, 2, 3, phonemes]
     
     W, B, C = init(layer, neuron)
-    update(learning_rate, W, B, C, layer, iteration)
+    theta = update(learning_rate, W, B, C, layer, iteration)
 
 if __name__ == '__main__':
     main()

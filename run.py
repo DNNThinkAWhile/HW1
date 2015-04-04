@@ -43,12 +43,12 @@ for i in range(iteration):
     err, gradC = calculate_error(phonemes, speech_ids, y_list, label_map, error_func_norm2)
     
     print 'err: ' + str(err)
-    print 'gradC: ' + str(gradC)
+    #print 'gradC: ' + str(gradC)
     
-    print a_list
+    #print a_list
 
     C = backpropagate(gradC, z_list, a_list, layer, w_and_b, features, batch_size)
-    update(learning_rate, w_and_b[0], w_and_b[1], C, i)
+    w_and_b = update(learning_rate, w_and_b[0], w_and_b[1], C, i)
     print '------------------------------------'
 
 
