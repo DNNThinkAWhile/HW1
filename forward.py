@@ -99,8 +99,10 @@ def forward(List2D_MFCC_data, List_speakID, WandB, BATCH_SIZE, isTest):
          OneTime_train_set.append(arr)
          OneTime_train_speechID.append(List_speakID[idx])
    else:
-      OneTime_train_set = List2D_MFCC_data
-      OneTime_train_speechID = List_speakID
+      for i in range(BATCH_SIZE):
+         arr = np.asfarray(List2D_MFCC_data[i])
+         OneTime_train_set.append(arr)
+         OneTime_train_speechID.append(List_speakID[i])
 
    for array in OneTime_train_set:
       temp_a_List = []
