@@ -24,7 +24,8 @@ def save_model(theta, iteration):
 #     C.append(C2)
 #     return W, B, C
 
-def update(learning_rate, W, B, C, layer, iteration):
+def update(learning_rate, W, B, C, iteration):
+    layer = len(W)
     for l in range(layer):
         W[l] -= learning_rate*C[0][layer-l-1]
         B[l] -= learning_rate*C[1][layer-l-1]
@@ -44,6 +45,7 @@ def update(learning_rate, W, B, C, layer, iteration):
     # print theta for debugging...
     # print theta_log
     save_model(theta, iteration)
+    return theta
 
 def main():
     iteration = 10

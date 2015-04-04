@@ -106,6 +106,9 @@ def forward(List2D_MFCC_data, List_speakID, WandB, BATCH_SIZE, isTest):
       temp_z_List = []
       z_layer = array
       for layer in range(0,LAYER_NUM,1):
+         # print w_List
+         # print z_layer
+         # print b_List
          z_layer = f_matrix_dot( w_List[layer] , z_layer , b_List[layer])
          temp_z_List.append(z_layer)
          z_layer = f_sigmoid(z_layer)
