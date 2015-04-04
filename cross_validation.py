@@ -30,14 +30,10 @@ def score(speech_ids, y, label_map):
     fn = 0
     
 def test(test_file, w_and_b):
-    print 'testfile:' + test_file
     predict_speech_ids, predict_features = read_file(test_file)
     speech_ids, features, a_list, z_list = forward(predict_features, predict_speech_ids, w_and_b, len(predict_speech_ids), True)
     #predict_speech_id, predict_y_labels = predict(cv_predict_feature_file, w_and_b, sol_map)
     predict_y_labels = [a[-1] for a in a_list]
-    print predict_speech_ids
-    print 'asdfsdfasdfasfasdf'
-    print speech_ids
     valid_answer, predict_answer = get_answer(phonemes, speech_ids, predict_y_labels, label_map, sol_map)
     print_fscore(valid_answer, predict_answer) 
 
