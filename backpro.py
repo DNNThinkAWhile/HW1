@@ -7,9 +7,9 @@ from theano import function
 
 
 def backpropagate (gradC = np.zeros(1) , z  = [],  a = [] , theta = [], featureset = [], batchsize = 0):
-        t = T.dvector('t')
-        u = T.nnet.sigmoid(t)
-        funcSigmoid = function([t],u)
+        #t = T.dvector('t')
+        #u = T.nnet.sigmoid(t)
+        #funcSigmoid = function([t],u)
         a = T.dvector('a')
         b = T.dvector('b')
         aMb = a * b
@@ -36,7 +36,7 @@ def backpropagate (gradC = np.zeros(1) , z  = [],  a = [] , theta = [], features
 		for i in range(layer , -1, -1):
                         print 'for i'
 			if i == layer :
-				lum[i] = funcMutiply(funcSigmoid(z[j][i - 1]), gradC)
+				lum[i] = funcMutiply(derOfSigmoid(z[j][i - 1]), gradC)
 				if i != 0 :
 					WC[i] = funcMutiply(a[j][i-1], lum[i])
 				else :
@@ -56,7 +56,7 @@ def backpropagate (gradC = np.zeros(1) , z  = [],  a = [] , theta = [], features
 				
 				if i != 0 :
 					# lum[i] =  (sig(z[j][i - 1]) * WT[i].transpose() ).transpose().dot(lum[i+1])
-                                        lum[i] = T.dot(funcMutiply(funcSigmoid(z[j][i - 1]),WT[i].T).T, lum[i + 1])
+                                        lum[i] = T.dot(funcMutiply(derOfSigmoid(z[j][i - 1]),WT[i].T).T, lum[i + 1])
 					WC[i] = funcMutiply(a[j][i-1], lum[i])
 				else :
 					# lum[i] =  ( featureset[j] * WT[i].transpose() ).transpose().dot(lum[i+1]) 
@@ -75,7 +75,13 @@ def backpropagate (gradC = np.zeros(1) , z  = [],  a = [] , theta = [], features
 		C[2*i + 1] = C[2*i + 1] / batchsize
 
 	return C
-	   
+
+def derOfSigmoid(z):
+    temp = 1 / (1 + math.exp(-1*z))
+    return = temp*(1-temp)
+
+
+
 def main():
 	backpropagate()
 

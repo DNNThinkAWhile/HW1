@@ -17,9 +17,9 @@ r = T.dvector('r')
 s = T.dot(p,q) + r 
 f_matrix_dot = function( [p,q,r] , s)
 
-t = T.dvector('t')
-u = T.nnet.sigmoid(t)
-f_sigmoid = function([t],u)
+x = T.dvector('x')
+z = 1/(T.exp((-1)*x)+1)
+sigmoid = function([x],z)
 
 
 #return (W,B)
@@ -111,7 +111,7 @@ def forward(List2D_MFCC_data, List_speakID, WandB, BATCH_SIZE, isTest):
 			#print str(w_List[layer].shape) + str(z_layer.shape) + str(b_List[layer].shape)
 			z_layer = f_matrix_dot( w_List[layer] , z_layer , b_List[layer])
 			temp_z_List.append(z_layer)
-			z_layer = f_sigmoid(z_layer)
+			z_layer = sigmoid(z_layer)
 			temp_a_List.append(z_layer)
 		 
 #      y_List.append(z_layer)
@@ -133,9 +133,6 @@ def forward(List2D_MFCC_data, List_speakID, WandB, BATCH_SIZE, isTest):
    
 
 	return (OneTime_train_speechID, OneTime_train_set , a_List, z_List)
-
-
-
 
 
 
