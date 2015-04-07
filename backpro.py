@@ -1,20 +1,18 @@
 
-#from theano import * 
+from theano import function 
 import numpy as np
 import theano.tensor as T
-from theano import function
-
 
 
 def backpropagate (gradC = np.zeros(1) , z  = [],  a = [] , theta = [], featureset = [], batchsize = 0):
-        t = T.dvector('t')
-        u = T.nnet.sigmoid(t)
-        funcSigmoid = function([t],u)
-
         A = T.dvector('A')
         B = T.dvector('B')
         funcMutiply = function([A, B], A * B)
 
+        t = T.dvector('t')
+        u = 1 / (T.exp((-1)*t)+1)
+        u_grad = u*(1-u)
+        funcSigmoid = function([t],u_grad)
 
 	C = []
 	ans  = []
@@ -79,7 +77,8 @@ def backpropagate (gradC = np.zeros(1) , z  = [],  a = [] , theta = [], features
 		C[2*i + 1] = C[2*i + 1] / batchsize
 
 	return C
-	   
+
+
 def main():
 	backpropagate()
 
