@@ -6,21 +6,19 @@ import numpy as np
 def sig (x):
 	return 1 / (1 + np.exp(-x))
 
-<<<<<<< HEAD
 
 def backpropagate (gradC = np.zeros(1) , z  = [],  a = [] , theta = [], featureset = [], batchsize = 0):
-        #t = T.dvector('t')
-        #u = T.nnet.sigmoid(t)
-        #funcSigmoid = function([t],u)
+        t = T.dvector('t')
+        u = 1 / (T.exp((-1)*t)+1)
+        u_grad = u*(1-u)
+        derOfSigmoid = function([t],u_grad)
+
         a = T.dvector('a')
         b = T.dvector('b')
         aMb = a * b
         aAb = a + b
         funcMutiply = function([a, b], aMb)
         funcAdd = function([a, b], aAb)
-=======
-def backpropagate (gradC = np.zeros(1) , z  = [],  a = [], theta = [], featureset = [], batchsize = 0):
->>>>>>> 424cc741d0b242ed021e2a66e2f13727bd72aa6e
 	C = []
 	ans  = []
 	WC = []
@@ -78,11 +76,6 @@ def backpropagate (gradC = np.zeros(1) , z  = [],  a = [], theta = [], featurese
 		C[2*i + 1] = C[2*i + 1] / batchsize
 
 	return C
-
-def derOfSigmoid(z):
-    temp = 1 / (1 + math.exp(-1*z))
-    return = temp*(1-temp)
-
 
 
 def main():
