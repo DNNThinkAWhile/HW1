@@ -6,7 +6,7 @@ import numpy as np
 def sig (x):
 	return 1 / (1 + np.exp(-x))
 
-def backpropagate (gradC = np.zeros(1) , z  = [],  a = [] , layer = 0, theta = [], featureset = [], batchsize = 0):
+def backpropagate (gradC = np.zeros(1) , z  = [],  a = [], theta = [], featureset = [], batchsize = 0):
 	C = []
 	ans  = []
 	WC = []
@@ -14,6 +14,7 @@ def backpropagate (gradC = np.zeros(1) , z  = [],  a = [] , layer = 0, theta = [
 	WT = []
 	W = theta[0]
 	b = theta[1]
+        layer = len(W)
 	for i in range(len(W)):
 		WT.append(np.transpose(W[i]))
 
