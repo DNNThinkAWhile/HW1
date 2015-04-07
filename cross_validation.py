@@ -26,10 +26,10 @@ def cut_file(orig_data_path, K):
         test_outfile = open('test_data_'+str(k+1), 'w')
         for idx in range(num_lines):
             if idx%K==k:
-                train_outfile.write(orig_data[idx])
+                test_outfile.write(orig_data[idx])
             else:
                 #if test_cnt < TEST_NUM:
-                test_outfile.write(orig_data[idx])
+                train_outfile.write(orig_data[idx])
                 #    test_cnt += 1
 def score(speech_ids, y, label_map):
     tp = 0
@@ -87,8 +87,8 @@ for k in range(1, K+1):
         C = backpropagate(gradC, z_list, a_list, w_and_b, features, batch_size)
         w_and_b = update(learning_rate, w_and_b[0], w_and_b[1], C, i)
         if i % 50 == 0 and i > 0:
-            #test(cv_predict_feature_file, w_and_b)
-            test(cv_train_feature_file, w_and_b)
+            test(cv_predict_feature_file, w_and_b)
+            #test(cv_train_feature_file, w_and_b)
     print '------------------------------------'
     # cv_predict_speech_ids, cv_predict_features = read_file(cv_predict_feature_file)
     # speech_ids, features, a_list, z_list = forward(cv_predict_features, cv_predict_speech_ids, w_and_b, len(cv_predict_speech_ids), True)

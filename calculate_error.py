@@ -54,7 +54,7 @@ def print_fscore(v1, v2):
     for n in range(len(v1)):
         if v1[n] == v2[n]:
             match += 1
-    accuracy = match/len(v1)*100.0
+    accuracy = float(match)/float(len(v1))*100.0
     print_file = '''
 Accuracy:  {a} % ({match}/{total})
 ==========================================
