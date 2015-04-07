@@ -12,7 +12,8 @@ def backpropagate (gradC = np.zeros(1) , z  = [],  a = [] , theta = [], features
         t = T.dvector('t')
         u = 1 / (T.exp((-1)*t)+1)
         u_grad = u*(1-u)
-        funcSigmoid = function([t],u_grad)
+        funcSigmoid = function([t], u)
+        funcSigmoidGrad = function([t],u_grad)
 
 	C = []
 	ans  = []
@@ -34,7 +35,7 @@ def backpropagate (gradC = np.zeros(1) , z  = [],  a = [] , theta = [], features
 		for i in range(layer , -1, -1):
 			if i == layer :
                                 #lum[i] = funcSigmoid(z[j][i-1]) * gradC
-				lum[i] = funcMutiply(funcSigmoid(z[j][i - 1]), gradC)
+				lum[i] = funcMutiply(funcSigmoidGrad(z[j][i - 1]), gradC)
 				if i != 0 :
 					WC[i] = funcMutiply(a[j][i-1], lum[i])
                                         #WC[i] = a[j][i-1] * lum[i]
@@ -56,7 +57,7 @@ def backpropagate (gradC = np.zeros(1) , z  = [],  a = [] , theta = [], features
 				
 				if i != 0 :
 					# lum[i] =  (sig(z[j][i - 1]) * WT[i].transpose() ).transpose().dot(lum[i+1])
-                                        lum[i] = (funcSigmoid(z[j][i-1]) * WT[i].transpose()).transpose().dot(lum[i+1])
+                                        lum[i] = (funcSigmoidGrad(z[j][i-1]) * WT[i].transpose()).transpose().dot(lum[i+1])
                                         #lum[i] = (funcMutiply(funcSigmoid(z[j][i-1]), WT[i].transpose())).transpose().dot(lum[i+1])
 					WC[i] = funcMutiply(a[j][i-1], lum[i])
 				else :
