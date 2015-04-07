@@ -27,6 +27,18 @@ def error_func_norm2(v1, v2):
 	df = np.array(d, dtype = 'f')
 	return norm2(df), norm2d(df)
 
+def error_func_cross_entropy(v_lab, v_pred):
+	x = T.fvector('x')
+	y = T.fvector('y')
+	rx = 1 - x;
+	ln_y = T.log(y)
+	ln_ry = T.log(1 - y)
+	z = (T.dot(x, ln_y) + T.dot(rx, ln_ry)) * (-1) / T.shape(x)[0];
+	cross_h = function([x, y], z, allow_input_downcast=True)
+	cross_h_grad = function([x, y], T.grad(z, y), allow_input_downcast=True)
+
+	return cross_h(v_lab, v_pred), cross_h_grad(v_lab, v_pred)
+
 def get_answer(phonemes, speech_id, predict_y_labels, label_map, sol_map):
     valid_answer = []
     predict_answer = [] 
