@@ -84,6 +84,7 @@ for k in range(1, K+1):
         y_list = [a[-1] for a in a_list]
         #err, gradC = calculate_error(phonemes, speech_ids, y_list, label_map, error_func_norm2)
         err, gradC = calculate_error(phonemes, speech_ids, y_list, label_map, error_func_cross_entropy)
+        print 'err:', err
         C = backpropagate(gradC, z_list, a_list, w_and_b, features, batch_size)
         w_and_b = update(learning_rate, w_and_b[0], w_and_b[1], C, i)
         if i % 50 == 0 and i > 0:
