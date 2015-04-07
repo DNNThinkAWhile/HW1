@@ -44,8 +44,8 @@ def print_fscore(v1, v2):
             match += 1
     accuracy = match/len(v1)*100.0
     print_file = '''
-    Accuracy:  {a} % ({match}/{total})
-    ==========================================
+Accuracy:  {a} % ({match}/{total})
+==========================================
     '''.format(a = accuracy, match = match, total = len(v1))
     print print_file
 

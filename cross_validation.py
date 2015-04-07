@@ -1,4 +1,5 @@
 import sys
+import numpy as np
 from forward import *           # init(), forward()
 from calculate_error import *   # read_label_map(), calculate_error()
 from backpro import *           # backpropagation()
@@ -14,16 +15,16 @@ def cut_file(orig_data_path, K):
         orig_data = f.readlines()
     num_lines = sum(1 for line in orig_data)
     for k in range(K):
-        test_cnt = 0;
+        #test_cnt = 0;
         train_outfile = open('train_data_'+str(k+1), 'w')
         test_outfile = open('test_data_'+str(k+1), 'w')
         for idx in range(num_lines):
             if idx%K==k:
                 train_outfile.write(orig_data[idx])
             else:
-                if test_cnt < TEST_NUM:
-                    test_outfile.write(orig_data[idx])
-                    test_cnt += 1
+                #if test_cnt < TEST_NUM:
+                test_outfile.write(orig_data[idx])
+                #    test_cnt += 1
 def score(speech_ids, y, label_map):
     tp = 0
     fp = 0
@@ -62,7 +63,10 @@ map_48_39_file = 'MLDS_HW1_RELEASE_v1/phones/48_39.map'
 features_file = 'MLDS_HW1_RELEASE_v1/mfcc/train.ark'
 
 print 'Start training models with', K, '-fold cross validation...'
-w_and_b = init(layer, neuron)
+#w_and_b = init(layer, neuron)
+# test model_9901
+load_model_path = 'model_9901.npy'
+w_and_b = np.load(load_model_path)
 label_map = read_label_map(train_label_file, map_48_39_file)
 sol_map = create_sol_map(map_48_39_file, phonemes)
 
@@ -79,7 +83,7 @@ for k in range(1, K+1):
         err, gradC = calculate_error(phonemes, speech_ids, y_list, label_map, error_func_norm2)
         C = backpropagate(gradC, z_list, a_list, layer, w_and_b, features, batch_size)
         w_and_b = update(learning_rate, w_and_b[0], w_and_b[1], C, i)
-        if i % 5 == 0 and i > 0:
+        if i % 20 == 0 and i > 0:
             test(cv_predict_feature_file, w_and_b)
     print '------------------------------------'
     # cv_predict_speech_ids, cv_predict_features = read_file(cv_predict_feature_file)
