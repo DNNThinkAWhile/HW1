@@ -10,12 +10,12 @@ def backpropagate (gradC = np.zeros(1) , z  = [],  a = [] , theta = [], features
         t = T.dvector('t')
         u = T.nnet.sigmoid(t)
         funcSigmoid = function([t],u)
-        a = T.dvector('a')
-        b = T.dvector('b')
-        aMb = a * b
-        aAb = a + b
-        funcMutiply = function([a, b], aMb)
-        funcAdd = function([a, b], aAb)
+
+        A = T.dvector('A')
+        B = T.dvector('B')
+        funcMutiply = function([A, B], A * B)
+
+
 	C = []
 	ans  = []
 	WC = []
@@ -34,20 +34,22 @@ def backpropagate (gradC = np.zeros(1) , z  = [],  a = [] , theta = [], features
 		WC = [None] * (layer + 1)
 		lum = [None] * (layer + 1)
 		for i in range(layer , -1, -1):
-                        print 'for i'
 			if i == layer :
+                                #lum[i] = funcSigmoid(z[j][i-1]) * gradC
 				lum[i] = funcMutiply(funcSigmoid(z[j][i - 1]), gradC)
 				if i != 0 :
 					WC[i] = funcMutiply(a[j][i-1], lum[i])
+                                        #WC[i] = a[j][i-1] * lum[i]
 				else :
 					WC[i] = funcMutiply(featureset[j], lum[i])
+                                        #WC[i] = featureset[j] * lum[i]
 				if j == 0:
 					#print 'i=' + str(i) 
 					C.append(WC[i])
 					C.append(lum[i])
 				else:
-					C[(layer  - i) * 2] = funcAdd(C[(layer - i) * 2], WC[i])
-					C[(layer  - i) * 2 + 1] = funcAdd(C[(layer - i)*2 + 1], lum[i])
+					C[(layer  - i) * 2] = C[(layer-i)*2] + WC[i] # funcAdd(C[(layer - i) * 2], WC[i])
+					C[(layer  - i) * 2 + 1] = C[(layer-i)*2+1] + lum[i]  # funcAdd(C[(layer - i)*2 + 1], lum[i])
 			else:
 				# print 'sigz shape ' + str(sig(z[j][i]).shape)
 				# print 'wt shape ' + str(WT[i+1].shape)
@@ -56,18 +58,20 @@ def backpropagate (gradC = np.zeros(1) , z  = [],  a = [] , theta = [], features
 				
 				if i != 0 :
 					# lum[i] =  (sig(z[j][i - 1]) * WT[i].transpose() ).transpose().dot(lum[i+1])
-                                        lum[i] = T.dot(funcMutiply(funcSigmoid(z[j][i - 1]),WT[i].T).T, lum[i + 1])
+                                        lum[i] = (funcSigmoid(z[j][i-1]) * WT[i].transpose()).transpose().dot(lum[i+1])
+                                        #lum[i] = (funcMutiply(funcSigmoid(z[j][i-1]), WT[i].transpose())).transpose().dot(lum[i+1])
 					WC[i] = funcMutiply(a[j][i-1], lum[i])
 				else :
-					# lum[i] =  ( featureset[j] * WT[i].transpose() ).transpose().dot(lum[i+1]) 
-                                        lum[i] = T.dot(funcMutiply(featureset[j], WT[i].T).T, lum[i + 1])
+                                        lum[i] = (featureset[j]*WT[i].transpose()).transpose().dot(lum[i+1])
+                                        #lum[i] = (funcMultiply(featureset[j], WT[i].transpose())).transpose().dot(lum[i+1])
 					WC[i] = funcMutiply(featureset[j], lum[i])
+                                        #WC[i] = featureset[j] * lum[i]
 				if j == 0 :
 					C.append(WC[i])
 					C.append(lum[i])
 				else:
-					C[(layer  - i) * 2] = funcAdd(C[(layer - i) * 2], WC[i])
-					C[(layer  - i) * 2 + 1] = funcAdd(C[(layer - i)*2 + 1], lum[i])
+					C[(layer  - i) * 2] = C[(layer-i)*2] + WC[i] #funcAdd(C[(layer - i) * 2], WC[i])
+					C[(layer  - i) * 2 + 1] = C[(layer-i)*2 + 1] + lum[i] #funcAdd(C[(layer - i)*2 + 1], lum[i])
 
 
 	for i in range(layer ):
