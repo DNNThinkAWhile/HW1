@@ -17,27 +17,31 @@ def calculate_error(phoneme_num, label_48_list, vy_48_list, labelmap, error_func
 		errd_total += errd
 	return (err_total / float(batch_size)), (errd_total / float(batch_size))
 
-def error_func_norm2(v1, v2):
-	x = T.fvector('x')
-	z = T.sqrt(T.sum(T.sqr(x)))
-	norm2 = function([x], z)
-	norm2d = function([x], T.grad(z, x))
+
+# theano_ function for error_func_norm2
+_n_x = T.fvector('x')
+_n_z = T.sqrt(T.sum(T.sqr(_n_x)))
+_n_norm2 = function([_n_x], _n_z)
+_n_norm2d = function([_n_x], T.grad(_n_z, _n_x))
 	
+def error_func_norm2(v1, v2):
 	d = abs(v2 - v1)
 	df = np.array(d, dtype = 'f')
-	return norm2(df), norm2d(df)
+	return _n_norm2(df), _n_norm2d(df)
+
+# theano function for error_func_cross_entropy
+_ce_x = T.fvector('x')
+_ce_y = T.fvector('y')
+_ce_rx = 1 - _ce_x;
+_ce_ln_y = T.log(_ce_y)
+_ce_ln_ry = T.log(1 - _ce_y)
+_ce_z = (T.dot(_ce_x, _ce_ln_y) + T.dot(_ce_rx, _ce_ln_ry)) * (-1) / T.shape(_ce_x)[0];
+_ce_cross_h = function([_ce_x, _ce_y], _ce_z, allow_input_downcast=True)
+_ce_cross_h_grad = function([_ce_x, _ce_y], T.grad(_ce_z, _ce_y), allow_input_downcast=True)
+
 
 def error_func_cross_entropy(v_lab, v_pred):
-	x = T.fvector('x')
-	y = T.fvector('y')
-	rx = 1 - x;
-	ln_y = T.log(y)
-	ln_ry = T.log(1 - y)
-	z = (T.dot(x, ln_y) + T.dot(rx, ln_ry)) * (-1) / T.shape(x)[0];
-	cross_h = function([x, y], z, allow_input_downcast=True)
-	cross_h_grad = function([x, y], T.grad(z, y), allow_input_downcast=True)
-
-	return cross_h(v_lab, v_pred), cross_h_grad(v_lab, v_pred)
+	return _ce_cross_h(v_lab, v_pred), _ce_cross_h_grad(v_lab, v_pred)
 
 def get_answer(phonemes, speech_id, predict_y_labels, label_map, sol_map):
     valid_answer = []
