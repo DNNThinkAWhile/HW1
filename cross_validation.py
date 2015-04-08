@@ -77,9 +77,9 @@ for k in range(1, K+1):
     print k, '-fold'
     cv_train_feature_file = 'train_data_' + str(k)
     cv_predict_feature_file = 'test_data_' + str(k)
+    cv_train_speech_ids, cv_train_features = read_file(cv_train_feature_file)
     for i in range(iteration):
         print 'iteration', i
-        cv_train_speech_ids, cv_train_features = read_file(cv_train_feature_file)
         speech_ids, features, a_list, z_list = forward(cv_train_features, cv_train_speech_ids, w_and_b, batch_size, False)
         y_list = [a[-1] for a in a_list]
         #err, gradC = calculate_error(phonemes, speech_ids, y_list, label_map, error_func_norm2)
