@@ -2,7 +2,7 @@ import sys
 
 if( len(sys.argv) != 7 ) :
     print '    cross_validation.py <layer> <# of neuron in each layer> <batch_size> <epoch> <learning_rate> <K-fold>'
-    print 'ex. cross_validation 3 5,6 10 20 0.01 10'
+    print 'ex. cross_validation 3 500,600 20 5 0.1 5'
     quit()
 
 import numpy as np
@@ -12,7 +12,6 @@ from backpro import *           # backpropagation()
 from update import *            # update(), save_model()
 from predict import *           # load_model(), create_sol_map()
 
-TEST_NUM = 10000;
 
 # K-FOLD CROSS-VALIDATION 
 
@@ -31,10 +30,6 @@ def cut_file(orig_data_path, K):
                 #if test_cnt < TEST_NUM:
                 train_outfile.write(orig_data[idx])
                 #    test_cnt += 1
-def score(speech_ids, y, label_map):
-    tp = 0
-    fp = 0
-    fn = 0
     
 def test(test_file, w_and_b):
     predict_speech_ids, predict_features = read_file(test_file)
@@ -46,7 +41,7 @@ def test(test_file, w_and_b):
 
 
 # Parameter setting
-raw = 39
+raw = 39*9
 phonemes = 48
 layer = int(sys.argv[1])
 neuron = []
@@ -69,9 +64,6 @@ features_file = 'MLDS_HW1_RELEASE_v1/mfcc/train.ark'
 
 print 'Start training models with', K, '-fold cross validation...'
 w_and_b = init(layer, neuron)
-# test model_9901
-#load_model_path = 'model_9901.npy'
-#w_and_b = np.load(load_model_path)
 label_map = read_label_map(train_label_file, map_48_39_file)
 sol_map = create_sol_map(map_48_39_file, phonemes)
 

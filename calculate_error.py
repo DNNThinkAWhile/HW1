@@ -82,7 +82,6 @@ def read_label_map(file_label, file_48_39):
 		for line in f:
 			tokens = line.strip().split(',')
 			d_1943_index[tokens[0]] = d_48_index[tokens[1]]
-			
 	return d_1943_index
 
 def main():

@@ -60,23 +60,45 @@ def init(layer,neuron):
    
    	return rList
 
-
+'''
 def read_file(filePath):
    	List_speakID = []
    	List2D_MFCC_data = []
-   
+    all_feature = []
    	with open(filePath, 'r') as f:
 		MFCC_trainFile = f.readlines()
-		num_lines = sum(1 for line in MFCC_trainFile)
-		for line in MFCC_trainFile:
-			partition = line.split()
-			List_speakID.append(partition[0])
-			List2D_MFCC_data.append(partition[1:])
+#num_lines = sum(1 for line in MFCC_trainFile)
+        for idx in range(sum(1 for line in MFCC_trainFile)):
+		    List_speakID.append(MFCC_trainFile[idx].split(' ')[0])
+            start = max(0, idx-4)
+            for i in range(9):
+                all_feature = all_feature + MFCC_trainFile[start+i].split(' ')[1:]
+		    List2D_MFCC_data.append(all_feature)
+            all_feature = []
 
    	f.close()
-   
   	return (List_speakID, List2D_MFCC_data)
-
+'''
+def read_file(filePath):
+    List_speakID = []
+    List2D_MFCC_data = []
+    with open(filePath, 'r') as f:
+        MFCC_trainFile = f.readlines()
+        num_lines = sum(1 for line in MFCC_trainFile)
+        for line in range(num_lines):
+            all_feature = []
+            List_speakID.append(MFCC_trainFile[line].split(' ')[0])
+            for i in range(9):
+                if line-4 < 0:
+                    all_feature = all_feature + MFCC_trainFile[i].strip('\n').split(' ')[1:]
+                elif line+4 > num_lines-1:
+                    all_feature = all_feature + MFCC_trainFile[line-4+i-(line+5-num_lines)].strip('\n').split(' ')[1:]
+                else:
+                    all_feature = all_feature + MFCC_trainFile[line-4+i].strip('\n').split(' ')[1:]
+            List2D_MFCC_data.append(all_feature)
+    f.close()
+    print List2D_MFCC_data
+    return (List_speakID, List2D_MFCC_data)
 
 # shuffle the samples
 def shuffle(speech_ids, features):
