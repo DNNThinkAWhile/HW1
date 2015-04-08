@@ -4,29 +4,30 @@ import numpy as np
 import theano.tensor as T
 
 
+backpro_A = T.dvector('backpro_A')
+backpro_B = T.dvector('backpro_B')
+funcMultiply = function([backpro_A, backpro_B], backpro_A * backpro_B)
+
+backpro_E = T.dvector('backpro_E')
+backpro_F = T.dmatrix('backpro_F')
+funcMatrixMulti = function([backpro_E, backpro_F], backpro_E * backpro_F)
+
+backpro_ADD1 = T.dvector('backpro_ADD1')
+backpro_ADD2 = T.dvector('backpro_ADD2')
+funcAdd = function([backpro_ADD1, backpro_ADD2], backpro_ADD1 + backpro_ADD2)
+
+backpro_toDotMatrix = T.dmatrix('backpro_toDotMatrix')
+backpro_toDotVector = T.dvector('backpro_toDotVector')
+backpro_ansDot = T.dot(backpro_toDotMatrix, backpro_toDotVector)
+funcDot = function([backpro_toDotMatrix, backpro_toDotVector], backpro_ansDot)
+
+backpro_t = T.dvector('backpro_t')
+backpro_u = 1 / (T.exp((-1)*backpro_t)+1)
+backpro_u_grad = backpro_u*(1-backpro_u)
+funcSigmoid = function([backpro_t], backpro_u)
+funcSigmoidGrad = function([backpro_t],backpro_u_grad)
+
 def backpropagate (gradC = np.zeros(1) , z  = [],  a = [] , theta = [], featureset = [], batchsize = 0):
-        A = T.dvector('A')
-        B = T.dvector('B')
-        funcMultiply = function([A, B], A * B)
-
-        E = T.dvector('E')
-        F = T.dmatrix('F')
-        funcMatrixMulti = function([E, F], E * F)
-
-        ADD1 = T.dvector('ADD1')
-        ADD2 = T.dvector('ADD2')
-        funcAdd = function([ADD1, ADD2], ADD1 + ADD2)
-
-        toDotMatrix = T.dmatrix('toDotMatrix')
-        toDotVector = T.dvector('toDotVector')
-        ansDot = T.dot(toDotMatrix, toDotVector)
-        funcDot = function([toDotMatrix, toDotVector], ansDot)
-
-        t = T.dvector('t')
-        u = 1 / (T.exp((-1)*t)+1)
-        u_grad = u*(1-u)
-        funcSigmoid = function([t], u)
-        funcSigmoidGrad = function([t],u_grad)
 
 	C = []
 	ans  = []
