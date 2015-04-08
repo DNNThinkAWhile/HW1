@@ -8,8 +8,8 @@ def save_model(theta, epoch, iteration):
 def update(learning_rate, W, B, C):
     layer = len(W)
     for l in range(layer):
-        W[l] -= learning_rate*C[0][layer-l-1]
-        B[l] -= learning_rate*C[1][layer-l-1]
+        W[l] -= learning_rate*C[0][l]
+        B[l] -= learning_rate*C[1][l]
     theta_log = '''
     ++ W weighting matrix ++
     W:       
