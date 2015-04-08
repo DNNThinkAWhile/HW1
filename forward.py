@@ -60,25 +60,6 @@ def init(layer,neuron):
    
    	return rList
 
-'''
-def read_file(filePath):
-   	List_speakID = []
-   	List2D_MFCC_data = []
-    all_feature = []
-   	with open(filePath, 'r') as f:
-		MFCC_trainFile = f.readlines()
-#num_lines = sum(1 for line in MFCC_trainFile)
-        for idx in range(sum(1 for line in MFCC_trainFile)):
-		    List_speakID.append(MFCC_trainFile[idx].split(' ')[0])
-            start = max(0, idx-4)
-            for i in range(9):
-                all_feature = all_feature + MFCC_trainFile[start+i].split(' ')[1:]
-		    List2D_MFCC_data.append(all_feature)
-            all_feature = []
-
-   	f.close()
-  	return (List_speakID, List2D_MFCC_data)
-'''
 def read_file(filePath):
     List_speakID = []
     List2D_MFCC_data = []
@@ -126,16 +107,11 @@ def forward(List2D_MFCC_data, List_speakID, WandB, BATCH_SIZE, iteration, isTest
 	if isTest == 0:
 		start = iteration * BATCH_SIZE
 		features_part = List2D_MFCC_data[start: start + BATCH_SIZE]
-		OneTime_train_set.extend([np.asfarray(f) for f in features_part])
+		OneTime_train_set.extend(features_part)
 		OneTime_train_speechID.extend(List_speakID[start: start + BATCH_SIZE])
-	  # 	for i in range(BATCH_SIZE):
-			# idx = (int)(random.random()*trainDataSetNum)
-			# arr = np.asfarray(List2D_MFCC_data[idx])
-			# OneTime_train_set.append(arr)
-			# OneTime_train_speechID.append(List_speakID[idx])
    	else:
 	  	for i in range(BATCH_SIZE):
-			arr = np.asfarray(List2D_MFCC_data[i])
+			arr = List2D_MFCC_data[i]
 			OneTime_train_set.append(arr)
 			OneTime_train_speechID.append(List_speakID[i])
 

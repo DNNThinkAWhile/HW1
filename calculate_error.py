@@ -1,6 +1,7 @@
 import theano.tensor as T
 from theano import function
 import numpy as np
+import sys
 
 def calculate_error(phoneme_num, label_48_list, vy_48_list, labelmap, error_func):
 	batch_size = len(label_48_list)
@@ -19,7 +20,7 @@ def calculate_error(phoneme_num, label_48_list, vy_48_list, labelmap, error_func
 
 
 # theano_ function for error_func_norm2
-_n_x = T.fvector('x')
+_n_x = T.dvector('x')
 _n_z = T.sqrt(T.sum(T.sqr(_n_x)))
 _n_norm2 = function([_n_x], _n_z)
 _n_norm2d = function([_n_x], T.grad(_n_z, _n_x))
@@ -30,8 +31,8 @@ def error_func_norm2(v1, v2):
 	return _n_norm2(df), _n_norm2d(df)
 
 # theano function for error_func_cross_entropy
-_ce_x = T.fvector('x')
-_ce_y = T.fvector('y')
+_ce_x = T.dvector('x')
+_ce_y = T.dvector('y')
 _ce_rx = 1 - _ce_x;
 _ce_ln_y = T.log(_ce_y)
 _ce_ln_ry = T.log(1 - _ce_y)
