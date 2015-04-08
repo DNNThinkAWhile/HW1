@@ -60,14 +60,14 @@ iterations_epoch = 0
 # Path setting
 train_label_file = 'MLDS_HW1_RELEASE_v1/label/train.lab'
 map_48_39_file = 'MLDS_HW1_RELEASE_v1/phones/48_39.map'
-features_file = 'MLDS_HW1_RELEASE_v1/mfcc/train.normalize.ark'
+features_file = 'MLDS_HW1_RELEASE_v1/mfcc/train.normalized.ark'
 
 print 'Start training models with', K, '-fold cross validation...'
 w_and_b = init(layer, neuron)
 label_map = read_label_map(train_label_file, map_48_39_file)
 sol_map = create_sol_map(map_48_39_file, phonemes)
 
-cut_file(features_file, K)
+#cut_file(features_file, K)
 for k in range(1, K+1):
     print k, '-fold'
     cv_train_feature_file = 'train_data_' + str(k)

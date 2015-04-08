@@ -42,7 +42,9 @@ _ce_cross_h_grad = function([_ce_x, _ce_y], T.grad(_ce_z, _ce_y), allow_input_do
 
 
 def error_func_cross_entropy(v_lab, v_pred):
-	return _ce_cross_h(v_lab, v_pred), _ce_cross_h_grad(v_lab, v_pred)
+    if _ce_cross_h(v_lab, v_pred) == float('Inf') or _ce_cross_h(v_lab, v_pred) == float('nan'):
+        return 0.0, _ce_cross_h_grad(v_lab, v_pred)
+    return _ce_cross_h(v_lab, v_pred), _ce_cross_h_grad(v_lab, v_pred)
 
 def get_answer(phonemes, speech_id, predict_y_labels, label_map, sol_map):
     valid_answer = []

@@ -76,9 +76,9 @@ def read_file(filePath):
                     all_feature = all_feature + MFCC_trainFile[line-4+i-(line+5-num_lines)].strip('\n').split(' ')[1:]
                 else:
                     all_feature = all_feature + MFCC_trainFile[line-4+i].strip('\n').split(' ')[1:]
-            List2D_MFCC_data.append(all_feature)
+            List2D_MFCC_data.append(np.asfarray(all_feature))
     f.close()
-    print List2D_MFCC_data
+    #print List2D_MFCC_data
     return (List_speakID, List2D_MFCC_data)
 
 # shuffle the samples
