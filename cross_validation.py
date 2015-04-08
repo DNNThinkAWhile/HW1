@@ -97,7 +97,9 @@ for k in range(1, K+1):
             w_and_b = update(learning_rate, w_and_b[0], w_and_b[1], C)
             
             if i % 1000 == 0 and i > 0:
+                print 'current model saved'
                 save_model(w_and_b, epoch, i)
+                print 'start predicting'
                 test(cv_predict_speech_ids, cv_predict_features, w_and_b)
 
     print '------------------------------------'
