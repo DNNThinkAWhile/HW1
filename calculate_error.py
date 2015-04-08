@@ -14,8 +14,8 @@ def calculate_error(phoneme_num, label_48_list, vy_48_list, labelmap, error_func
 		vlabel[label_idx] = 1
 
 		err, errd = error_func(vlabel, vy_48_list[i])
-		err_total += err
-		errd_total += errd
+		err_total += np.nan_to_num(err)
+		errd_total += np.nan_to_num(errd)
 	return (err_total / float(batch_size)), (errd_total / float(batch_size))
 
 
