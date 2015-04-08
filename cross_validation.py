@@ -97,7 +97,7 @@ for k in range(1, K+1):
             print 'err:', err
             C = backpropagate(gradC, z_list, a_list, w_and_b, features, batch_size)
             w_and_b = update(learning_rate, w_and_b[0], w_and_b[1], C, i)
-            if i % 50 == 0 and i > 0:
+            if i % 1000 == 0 and i > 0:
                 test(cv_predict_feature_file, w_and_b)
                 #test(cv_train_feature_file, w_and_b)
 
