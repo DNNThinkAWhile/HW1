@@ -32,7 +32,7 @@ features_file = 'MLDS_HW1_RELEASE_v1/mfcc/train.ark'
 w_and_b = init(layer, neuron)
 label_map = read_label_map(train_label_file, map_48_39_file)
 all_speech_ids, all_features = read_file(features_file)
-
+all_speech_ids, all_features = shuffle(all_speech_ids, all_features)
 print 'Start Training...'
 for i in range(iteration):
     print 'iteration: ', i

@@ -78,9 +78,19 @@ def read_file(filePath):
   	return (List_speakID, List2D_MFCC_data)
 
 
+# shuffle the samples
+def shuffle(speech_ids, features):
+	length = len(speech_ids)
+	idx = [i for i in range(length)]
+	random.shuffle(idx)
+	new_speech_ids = [speech_ids[i] for i in idx]
+	new_features = [features[i] for i in idx]
+	return new_speech_ids, new_features
+
+
 ### get Count of "BATCH_SIZE" data to train for one time ### 
 
-def forward(List2D_MFCC_data, List_speakID, WandB, BATCH_SIZE, isTest):
+def forward(List2D_MFCC_data, List_speakID, WandB, BATCH_SIZE, iteration, isTest):
 	w_List = WandB[0]
 	b_List = WandB[1]
 	a_List = []
@@ -92,11 +102,15 @@ def forward(List2D_MFCC_data, List_speakID, WandB, BATCH_SIZE, isTest):
 	OneTime_train_set = []
 	OneTime_train_speechID = []
 	if isTest == 0:
-	  	for i in range(BATCH_SIZE):
-			idx = (int)(random.random()*trainDataSetNum)
-			arr = np.asfarray(List2D_MFCC_data[idx])
-			OneTime_train_set.append(arr)
-			OneTime_train_speechID.append(List_speakID[idx])
+		start = iteration * BATCH_SIZE
+		features_part = List2D_MFCC_data[start: start + BATCH_SIZE]
+		OneTime_train_set.extend([np.asfarray(f) for f in features_part])
+		OneTime_train_speechID.extend(List_speakID[start: start + BATCH_SIZE])
+	  # 	for i in range(BATCH_SIZE):
+			# idx = (int)(random.random()*trainDataSetNum)
+			# arr = np.asfarray(List2D_MFCC_data[idx])
+			# OneTime_train_set.append(arr)
+			# OneTime_train_speechID.append(List_speakID[idx])
    	else:
 	  	for i in range(BATCH_SIZE):
 			arr = np.asfarray(List2D_MFCC_data[i])
