@@ -71,7 +71,7 @@ def read_file(filePath):
 		for line in MFCC_trainFile:
 			partition = line.split()
 			List_speakID.append(partition[0])
-			List2D_MFCC_data.append(partition[1:])
+			List2D_MFCC_data.append(np.asfarray(partition[1:]))
 
    	f.close()
    
@@ -104,16 +104,11 @@ def forward(List2D_MFCC_data, List_speakID, WandB, BATCH_SIZE, iteration, isTest
 	if isTest == 0:
 		start = iteration * BATCH_SIZE
 		features_part = List2D_MFCC_data[start: start + BATCH_SIZE]
-		OneTime_train_set.extend([np.asfarray(f) for f in features_part])
+		OneTime_train_set.extend(features_part)
 		OneTime_train_speechID.extend(List_speakID[start: start + BATCH_SIZE])
-	  # 	for i in range(BATCH_SIZE):
-			# idx = (int)(random.random()*trainDataSetNum)
-			# arr = np.asfarray(List2D_MFCC_data[idx])
-			# OneTime_train_set.append(arr)
-			# OneTime_train_speechID.append(List_speakID[idx])
    	else:
 	  	for i in range(BATCH_SIZE):
-			arr = np.asfarray(List2D_MFCC_data[i])
+			arr = List2D_MFCC_data[i]
 			OneTime_train_set.append(arr)
 			OneTime_train_speechID.append(List_speakID[i])
 
