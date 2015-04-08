@@ -96,10 +96,12 @@ for k in range(1, K+1):
             err, gradC = calculate_error(phonemes, speech_ids, y_list, label_map, error_func_cross_entropy)
             print 'err:', err
             C = backpropagate(gradC, z_list, a_list, w_and_b, features, batch_size)
-            w_and_b = update(learning_rate, w_and_b[0], w_and_b[1], C, i)
+            w_and_b = update(learning_rate, w_and_b[0], w_and_b[1], C)
+
+            
             if i % 1000 == 0 and i > 0:
+                save_model(w_and_b, epoch, iteration)
                 test(cv_predict_feature_file, w_and_b)
-                #test(cv_train_feature_file, w_and_b)
 
     print '------------------------------------'
     # cv_predict_speech_ids, cv_predict_features = read_file(cv_predict_feature_file)

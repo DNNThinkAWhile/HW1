@@ -1,11 +1,11 @@
 import numpy as np
 
 
-def save_model(theta, iteration):
-    save_model_path = 'model_' + str(iteration)
+def save_model(theta, epoch, iteration):
+    save_model_path = 'model_' + str(epoch) + '_' + str(iteration)
     np.save(save_model_path, theta)
 
-def update(learning_rate, W, B, C, iteration):
+def update(learning_rate, W, B, C):
     layer = len(W)
     for l in range(layer):
         W[l] -= learning_rate*C[0][layer-l-1]
@@ -25,7 +25,6 @@ def update(learning_rate, W, B, C, iteration):
     theta.append(B)
     # print theta for debugging...
     # print theta_log
-    save_model(theta, iteration)
     return theta
 
 def main():
