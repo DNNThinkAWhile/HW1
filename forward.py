@@ -105,10 +105,10 @@ def forward(List2D_MFCC_data, List_speakID, WandB, BATCH_SIZE, iteration, isTest
 	OneTime_train_set = []
 	OneTime_train_speechID = []
 	if isTest == 0:
-		start = iteration * BATCH_SIZE
-		features_part = List2D_MFCC_data[start: start + BATCH_SIZE]
-		OneTime_train_set.extend(features_part)
-		OneTime_train_speechID.extend(List_speakID[start: start + BATCH_SIZE])
+                start = iteration * BATCH_SIZE
+                features_part = List2D_MFCC_data[start: start + BATCH_SIZE]
+                OneTime_train_set.extend(features_part)
+                OneTime_train_speechID.extend(List_speakID[start: start + BATCH_SIZE])
    	else:
 	  	for i in range(BATCH_SIZE):
 			arr = List2D_MFCC_data[i]

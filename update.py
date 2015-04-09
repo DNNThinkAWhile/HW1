@@ -2,7 +2,7 @@ import numpy as np
 
 
 def save_model(theta, epoch, iteration):
-    save_model_path = 'model_' + str(epoch) + '_' + str(iteration)
+    save_model_path = 'model_' + str(epoch) + '_' + str(iteration) + '_total'
     np.save(save_model_path, theta)
 
 def update(learning_rate, W, B, C):
@@ -10,21 +10,9 @@ def update(learning_rate, W, B, C):
     for l in range(layer):
         W[l] -= learning_rate*C[0][l]
         B[l] -= learning_rate*C[1][l]
-    theta_log = '''
-    ++ W weighting matrix ++
-    W:       
-    {W}
-  
-    ++ B matrix ++
-    {B}
-
-    =======================================================================
-    '''.format(W=W, B=B)
     theta = []
     theta.append(W)
     theta.append(B)
-    # print theta for debugging...
-    # print theta_log
     return theta
 
 def main():

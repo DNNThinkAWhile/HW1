@@ -61,9 +61,11 @@ iterations_epoch = 0
 train_label_file = 'MLDS_HW1_RELEASE_v1/label/train.lab'
 map_48_39_file = 'MLDS_HW1_RELEASE_v1/phones/48_39.map'
 features_file = 'MLDS_HW1_RELEASE_v1/mfcc/train.normalized.ark'
-
+test_file = 'MLDS_HW1_RELEASE_v1/mfcc/test.ark'
 print 'Start training models with', K, '-fold cross validation...'
-w_and_b = init(layer, neuron)
+#w_and_b = init(layer, neuron)
+# Load theta from model
+w_and_b = np.load('good_model/model_0_16000.npy')
 label_map = read_label_map(train_label_file, map_48_39_file)
 sol_map = create_sol_map(map_48_39_file, phonemes)
 
@@ -72,40 +74,41 @@ for k in range(1, K+1):
     print k, '-fold'
     cv_train_feature_file = 'train_data_' + str(k)
     cv_predict_feature_file = 'test_data_' + str(k)
-    cv_train_speech_ids, cv_train_features = read_file(cv_train_feature_file)
+    #cv_train_speech_ids, cv_train_features = read_file(cv_train_feature_file)
+    # read entire file
+    cv_train_speech_ids, cv_train_features = read_file(features_file)
     cv_train_speech_ids, cv_train_features = shuffle(cv_train_speech_ids, cv_train_features)
-    cv_predict_speech_ids, cv_predict_features = read_file(cv_predict_feature_file)
+    #cv_predict_speech_ids, cv_predict_features = read_file(cv_predict_feature_file)
 
 
     train_size = len(cv_train_speech_ids)
     iterations_epoch = train_size / batch_size
+    min_err = 2
     for epoch in range(max_epoch):
         print 'epoch ', epoch
 
         for i in range(iterations_epoch):
-            print 'iteration', i
+            #print 'iteration', i
             
             speech_ids, features, a_list, z_list = \
                 forward(cv_train_features, cv_train_speech_ids, w_and_b, batch_size, i, False)
             
             y_list = [a[-1] for a in a_list]
-            err, gradC = calculate_error(phonemes, speech_ids, y_list, label_map, error_func_cross_entropy)
-            
-            print 'err:', err
+            err, gradC = calculate_error(phonemes, speech_ids, y_list, label_map, error_func_norm2)
+            if err < min_err:
+                print 'min_err:', err
+                min_err = err
 
             C = backpropagate(gradC, z_list, a_list, w_and_b, features, batch_size)
             w_and_b = update(learning_rate, w_and_b[0], w_and_b[1], C)
             
-            if i % 1000 == 0 and i > 0:
+            if i % 2500 == 0 and i > 0:
+                print 'iteration', i
                 print 'current model saved'
                 save_model(w_and_b, epoch, i)
                 print 'start predicting'
                 test(cv_predict_speech_ids, cv_predict_features, w_and_b)
 
     print '------------------------------------'
-    # cv_predict_speech_ids, cv_predict_features = read_file(cv_predict_feature_file)
-    # speech_ids, features, a_list, z_list = forward(cv_predict_features, cv_predict_speech_ids, w_and_b, len(cv_predict_speech_ids), True)
-    # predict_y_labels = [a[-1] for a in a_list]
-    # valid_answer, predict_answer = get_answer(phonemes, speech_ids, predict_y_labels, label_map, sol_map)
-    # print_fscore(valid_answer, predict_answer) 
-
+    predict_speech_id, predict_y_labels = predict(test_file, w_and_b, sol_map)
+    predict_outfile(predict_speech_id, predict_y_labels)
