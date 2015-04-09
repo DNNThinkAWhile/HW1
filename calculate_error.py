@@ -21,15 +21,14 @@ def calculate_error(phoneme_num, label_48_list, vy_48_list, labelmap, error_func
 
 
 # theano_ function for error_func_norm2
-_n_x = T.dvector('x')
-_n_z = T.sqrt(T.sum(T.sqr(_n_x)))
-_n_norm2 = function([_n_x], _n_z)
-_n_norm2d = function([_n_x], T.grad(_n_z, _n_x))
+_n_x = T.dvector('x') # sigmoid(a) 
+_n_y = T.dvector('y') # label [0,0,1,0,0,...,0]
+_n_z = T.sqrt(T.sum((_n_x - _n_y) ** 2)) / T.shape(_n_x)[0]
+_n_norm2 = function([_n_x, _n_y], _n_z)
+_n_norm2d = function([_n_x, _n_y], T.grad(_n_z, _n_x))
 	
-def error_func_norm2(v1, v2):
-	d = abs(v2 - v1)
-	df = np.array(d, dtype = 'f')
-	return _n_norm2(df), _n_norm2d(df)
+def error_func_norm2(v_lab, v_pred):
+	return _n_norm2(v_pred, v_lab), _n_norm2d(v_pred, v_lab)
 
 # theano function for error_func_cross_entropy
 _ce_x = T.dvector('x')
