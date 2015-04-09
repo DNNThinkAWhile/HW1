@@ -10,21 +10,9 @@ def update(learning_rate, W, B, C, namda, n):
     for l in range(layer):
         W[l] = (1 - (namda*learning_rate)/n)*W[l] - learning_rate*C[0][l]
         B[l] -= learning_rate*C[1][l]
-    theta_log = '''
-    ++ W weighting matrix ++
-    W:       
-    {W}
-  
-    ++ B matrix ++
-    {B}
-
-    =======================================================================
-    '''.format(W=W, B=B)
     theta = []
     theta.append(W)
     theta.append(B)
-    # print theta for debugging...
-    # print theta_log
     return theta
 
 def main():

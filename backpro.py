@@ -53,9 +53,6 @@ def backpropagate (gradC = np.zeros(1) , z  = [],  a = [] , theta = [], features
 	for i in range(len(W)):
 		WT.append(np.transpose(W[i]))
 
-	# print 'W len=' + str(len(W))
-	# print 'WT len=' + str(len(WT))
-
 	finalWC = [None] * (layer)
 	finallum = [None] * (layer)
 
@@ -65,44 +62,24 @@ def backpropagate (gradC = np.zeros(1) , z  = [],  a = [] , theta = [], features
 		lum = [None] * (layer)
 		for i in range(layer-1 , -1, -1):
 			if i == layer -1:
-                                #lum[i] = funcSigmoid(z[j][i-1]) * gradC
 				lum[i] = funcMultiply(funcSigmoidGrad(z[j][i]), gradC)
 				if i != 0 :
 					WC[i] = func2MatrixDot( np.matrix(lum[i]).transpose() , np.matrix(a[j][i-1]) )
-                                        #WC[i] = funcMultiply(a[j][i-1], lum[i])
 				else :
 					WC[i] = func2MatrixDot( np.matrix(lum[i]).transpose() , np.matrix(featureset[j]) )
-					#WC[i] = funcMultiply(featureset[j], lum[i])
 				if j == 0:
-					#print 'i=' + str(i) 
 					finalWC[i] = WC[i]
 					finallum[i] = lum[i]
 				else:
-					#print j,':',np.shape(C[(layer-i-1)*2])
-					#print np.shape(WC[i])
 					finalWC[i] = func2MatrixAdd(finalWC[i], WC[i])
-					#C[(layer-i-1) * 2] = func2MatrixAdd(C[(layer-i-1) * 2], WC[i])
 					finallum[i] = funcAdd(finallum[i], lum[i])
-					#C[(layer-i-1) * 2 + 1] = funcAdd(C[(layer-i-1)*2 + 1], lum[i])
 			else:
-				# print 'sigz shape ' + str(sig(z[j][i]).shape)
-				# print 'wt shape ' + str(WT[i+1].shape)
-				# print 'lum shape ' + str(lum[i - 1].shape)
-				#print 'i=' + str(i)
-				
 				if i != 0 :
-                                        #lum[i] = (funcSigmoidGrad(z[j][i-1]) * WT[i].transpose()).transpose().dot(lum[i+1])
-                                        #lum[i] = funcMatrixMulti(funcSigmoidGrad(z[j][i-1]), WT[i].transpose()).transpose().dot(lum[i+1])
                                         toDot = funcDot(WT[i+1], lum[i+1])
                                         lum[i] = func2vectorDot(funcSigmoidGrad(z[j][i]),toDot)
-					#WC[i] = funcMultiply(a[j][i-1], lum[i])
 					WC[i] = func2MatrixDot( np.matrix(lum[i]).transpose() , np.matrix(a[j][i-1]) )
 				else :
-                                        #lum[i] = (featureset[j]*WT[i].transpose()).transpose().dot(lum[i+1])
-                                        #toDot = funcMatrixMulti(funcSigmoidGrad(z[j][i]), WT[i+1])
                                         lum[i] = func2vectorDot(funcSigmoidGrad(z[j][i]),funcDot(WT[i+1], lum[i+1]))
-                                        #lum[i] = funcDot(toDot, lum[i+1])
-					#WC[i] = funcMultiply(featureset[j], lum[i])
 					WC[i] = func2MatrixDot( np.matrix(lum[i]).transpose() , np.matrix(featureset[j]) )
 				if j == 0 :
 					finalWC[i] = WC[i]
