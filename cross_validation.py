@@ -1,8 +1,8 @@
 import sys
 
-if( len(sys.argv) != 7 ) :
-    print '    cross_validation.py <layer> <# of neuron in each layer> <batch_size> <epoch> <learning_rate> <K-fold>'
-    print 'ex. cross_validation 3 5,6 10 20 0.01 10'
+if( len(sys.argv) != 8 ) :
+    print '    cross_validation.py <layer> <# of neuron in each layer> <batch_size> <epoch> <learning_rate> <K-fold> <lamda>'
+    print 'ex. cross_validation 3 5,6 10 20 0.01 10 0.1'
     quit()
 
 import numpy as np
@@ -60,7 +60,7 @@ learning_rate = float(sys.argv[5])
 K = int(sys.argv[6])
 train_size = 0
 iterations_epoch = 0
-
+namda = float(sys.argv[7])
 
 # Path setting
 train_label_file = 'MLDS_HW1_RELEASE_v1/label/train.lab'
@@ -97,7 +97,7 @@ for k in range(1, K+1):
                 forward(cv_train_features, cv_train_speech_ids, w_and_b, batch_size, i, False)
             
             y_list = [a[-1] for a in a_list]
-            err, gradC = calculate_error(phonemes, speech_ids, y_list, label_map, error_func_cross_entropy)
+            err, gradC = calculate_error(phonemes, speech_ids, y_list, label_map, error_func_norm2, namda, len(cv_train_features), w_and_b[0])
             
             print 'err:', err
 

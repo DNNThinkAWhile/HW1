@@ -3,11 +3,18 @@ from theano import function
 import numpy as np
 import sys
 
-def calculate_error(phoneme_num, label_48_list, vy_48_list, labelmap, error_func):
+def calculate_error(phoneme_num, label_48_list, vy_48_list, labelmap, error_func, namda, n, WList):
 	batch_size = len(label_48_list)
 	
 	err_total = 0
 	errd_total = np.zeros(phoneme_num)
+        K = 0
+        for W in WList:
+            for x in np.nditer(W):
+                K += x*x
+
+
+        regularization = (namda*K)/(2*n)
 	for i in range(batch_size):
 		label_idx = labelmap[label_48_list[i]]
 		vlabel = np.zeros(phoneme_num)
@@ -16,8 +23,8 @@ def calculate_error(phoneme_num, label_48_list, vy_48_list, labelmap, error_func
 		err, errd = error_func(vlabel, vy_48_list[i])
 		err_total += err
 		errd_total += errd
-	return np.nan_to_num(err_total / float(batch_size)),\
-               np.nan_to_num(errd_total / float(batch_size))
+	return np.nan_to_num(err_total / float(batch_size))+regularization,\
+               np.nan_to_num(errd_total / float(batch_size))+regularization
 
 
 # theano_ function for error_func_norm2
