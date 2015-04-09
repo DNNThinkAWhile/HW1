@@ -81,6 +81,9 @@ label_map = read_label_map(train_label_file, map_48_39_file)
 sol_map = create_sol_map(map_48_39_file, phonemes)
 
 cut_file(features_file, K)
+
+dnn = Dnn(w_and_b)
+
 for k in range(1, K+1):
     print k, '-fold'
     cv_train_feature_file = 'train_data_' + str(k)
@@ -97,8 +100,7 @@ for k in range(1, K+1):
 
         for i in range(iterations_epoch):
             print 'iteration', i
-            theta = w_and_b
-            d_w, d_b = train(cv_train_speech_ids, cv_train_features, theta, batch_size, i, phonemes, label_map, error_func_norm2)
+            d_w, d_b = dnn.train(cv_train_speech_ids, cv_train_features, batch_size, i, phonemes, label_map, error_func_norm2, learning_rate)
 
             # print 'd_w[0]', d_w[0].shape
             # print 'd_w[1]', d_w[1].shape
@@ -107,14 +109,14 @@ for k in range(1, K+1):
             # print 'd_b[1]', d_b[1].shape
 
 
-            w_and_b = update(learning_rate, theta[0], theta[1], (d_w, d_b))
+            dnn.update(learning_rate, (d_w, d_b))
 
             if i == 500:
                 exit(0)
 
             if i % 1000 == 0 and i > 0:
-                save_model(w_and_b, epoch, i)
-                test(cv_predict_speech_ids, cv_predict_features, w_and_b)
+                save_model(dnn.theta, epoch, i)
+                test(cv_predict_speech_ids, cv_predict_features, theta)
 
     print '------------------------------------'
     # cv_predict_speech_ids, cv_predict_features = read_file(cv_predict_feature_file)

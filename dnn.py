@@ -131,20 +131,6 @@ def shuffle(speech_ids, features):
 #     return (OneTime_train_speechID, OneTime_train_set , a_List, z_List)
 
 
-def forward(feat, spch_id, theta):
-    w = theta[0]
-    b = theta[1]
-    layer_num = len(w)
-    a = []
-    z = []
-    a_layer = feat
-    for l in range(0,layer_num,1):
-        z_layer = f_matrix_dot(w[l], a_layer , b[l])
-        z.append(z_layer)
-        a_layer = sigmoid(z_layer)
-        a.append(a_layer)
-    return a, z
-
 
 
 
@@ -233,66 +219,117 @@ def numpy_sigmoid_grad(vec):
 #                 WC[i] = func2MatrixDot( np.matrix(lum[i]).transpose() , np.matrix(featureset[j]) )
 #     return (finalWC, finallum)
 
-def backprop(grad_c, z, a, theta, feat):
-    w = theta[0]    
-    b = theta[1]
-    layer_num = len(w)
-    wc = [None] * (layer_num)
-    lum = [None] * (layer_num)
-    wt = []
-    for i in range(layer_num):
-        wt.append(np.transpose(w[i]))
+
+class Dnn():
+    def __init__(self, theta):
+        self.theta = theta
+        w = theta[0]
+        b = theta[1]
+        self.layer_num = len(w)
+        self.wc = [None] * (self.layer_num)
+        self.lum = [None] * (self.layer_num)
+        for i in range(self.layer_num):
+            self.wc[i] = np.matrix(np.empty((w[i].shape)))
+            self.lum[i] = np.empty((b[i].shape))
+
+
+
+    def backprop(self, grad_c, z, a, feat):
+        w = self.theta[0]    
+        b = self.theta[1]
+        layer_num = self.layer_num
+        wc = self.wc
+        lum = self.lum
+        wt = []
+        for i in range(layer_num):
+            wt.append(np.transpose(w[i]))
+
+        for i in range(layer_num - 1 , -1, -1):
+
+            v_right = np.empty(lum[i].shape)
+            if i == layer_num - 1:
+                v_right = grad_c
+            else:
+                #v_right = funcDot(wt[i + 1], lum[i + 1])
+                np.dot(wt[i + 1], lum[i + 1], v_right)
+            # lum[i] = funcMultiply(funcSigmoidGrad(z[i]), v_right)
+            np.multiply(numpy_sigmoid_grad(z[i]), v_right, lum[i])
+
+            if i > 0:
+                #wc[i] = func2MatrixDot( np.matrix(lum[i]).transpose() , np.matrix(a[i-1]) )
+                # print wc[i].shape
+                # print np.dot(np.matrix(lum[i]).transpose(), np.matrix(a[i-1])).shape
+                np.dot(np.matrix(lum[i]).transpose(), np.matrix(a[i-1]), wc[i])
+            else:
+                #wc[i] = func2MatrixDot( np.matrix(lum[i]).transpose() , np.matrix(feat) )
+                np.dot(np.matrix(lum[i]).transpose(), np.matrix(feat), wc[i])
+        return wc, lum
+
+    def forward(self, feat, spch_id):
+        w = self.theta[0]
+        b = self.theta[1]
+        layer_num = self.layer_num
+        a = []
+        z = []
+        a_layer = feat
+        for l in range(0,layer_num,1):
+            z_layer = f_matrix_dot(w[l], a_layer , b[l])
+            z.append(z_layer)
+            a_layer = sigmoid(z_layer)
+            a.append(a_layer)
+        return a, z
+
+
+    def update(self, learning_rate, C):
+        layer_num = self.layer_num
+        for l in range(layer_num):
+            self.theta[0][l] -= learning_rate*C[0][l]
+            self.theta[1][l] -= learning_rate*C[1][l]
         
-    for i in range(layer_num - 1 , -1, -1):
-
-        v_right = None
-        if i == layer_num - 1:
-            v_right = grad_c
-        else:
-            #v_right = funcDot(wt[i + 1], lum[i + 1])
-            v_right = wt[i + 1].dot(lum[i + 1])
-        # lum[i] = funcMultiply(funcSigmoidGrad(z[i]), v_right)
-        lum[i] = numpy_sigmoid_grad(z[i]) * v_right
-
-        if i > 0:
-            #wc[i] = func2MatrixDot( np.matrix(lum[i]).transpose() , np.matrix(a[i-1]) )
-            wc[i] = np.dot(np.matrix(lum[i]).transpose(), np.matrix(a[i-1]))
-        else:
-            #wc[i] = func2MatrixDot( np.matrix(lum[i]).transpose() , np.matrix(feat) )
-            wc[i] = np.dot(np.matrix(lum[i]).transpose(), np.matrix(feat))
-    return wc, lum
-
-def train(speech_ids, features, theta, batch_size, iteration, phoneme_num, label_map, error_func):
-    
-    start = iteration * batch_size
-    feats_part = features[start: start + batch_size]
-    spch_ids_part = speech_ids[start: start + batch_size]
-    d_w_all = [None] * batch_size
-    d_b_all = [None] * batch_size
-
-    for i in range(batch_size):    
-
-        spch_id = spch_ids_part[i]
-        feat = feats_part[i]
-
-        a, z = forward(feat, spch_id, theta)
         
-        y = a[-1]
-        err, grad_c = calculate_error(phoneme_num, [spch_id], [y], label_map, error_func)
+        # theta_log = '''
+        # ++ W weighting matrix ++
+        # W:       
+        # {W}
+      
+        # ++ B matrix ++
+        # {B}
 
-        (d_w_all[i], d_b_all[i]) = backprop(grad_c, z, a, theta, feat)
-
-        # print 'd_w_all[i] len ' , len(d_w_all[i])
-        # print 'd_w_all[i][0]: ', d_w_all[i][0]
-        # print 'd_w_all[i][1] shape', d_w_all[i][1].shape
-        # exit(0)
+        # =======================================================================
+        # '''.format(W=self.theta[0], B=self.theta[1])
 
 
-    # print 'd_w_all ', d_w_all
-    # a = np.mean(d_w_all, axis=0)
-    # print 'd_b_all ', d_b_all
-    # b = np.mean(d_b_all, axis=0)
-    return (np.mean(d_w_all, axis=0), np.mean(d_b_all, axis=0))
+    def train(self, speech_ids, features, batch_size, iteration, phoneme_num, label_map, error_func, learning_rate):
+        
+        start = iteration * batch_size
+        feats_part = features[start: start + batch_size]
+        spch_ids_part = speech_ids[start: start + batch_size]
+        d_w_all = [None] * batch_size
+        d_b_all = [None] * batch_size
+
+        for i in range(batch_size):    
+
+            spch_id = spch_ids_part[i]
+            feat = feats_part[i]
+
+            a, z = self.forward(feat, spch_id)
+            
+            y = a[-1]
+            err, grad_c = calculate_error(phoneme_num, [spch_id], [y], label_map, error_func)
+
+            (d_w_all[i], d_b_all[i]) = self.backprop(grad_c, z, a, feat)
+
+            # print 'd_w_all[i] len ' , len(d_w_all[i])
+            # print 'd_w_all[i][0]: ', d_w_all[i][0]
+            # print 'd_w_all[i][1] shape', d_w_all[i][1].shape
+            # exit(0)
+
+
+        # print 'd_w_all ', d_w_all
+        # a = np.mean(d_w_all, axis=0)
+        # print 'd_b_all ', d_b_all
+        # b = np.mean(d_b_all, axis=0)
+        return np.mean(d_w_all, axis=0), np.mean(d_b_all, axis=0)
 
 
 
