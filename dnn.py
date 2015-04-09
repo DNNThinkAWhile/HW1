@@ -42,19 +42,13 @@ def init(layer,neuron):
     b1 = np.random.uniform(w_Min,w_Max,(NEURON_NUM[0]))
     w_List.append(w1);
     b_List.append(b1);
-    idx = 0
-    for i in range(len(NEURON_NUM)):
-        iNeuron = NEURON_NUM[i]
-        if i == len(NEURON_NUM) - 1:
-            w_i = np.random.uniform(w_Min,w_Max,(PHONE_NUM,iNeuron))
-            b_i = np.random.uniform(w_Min,w_Max,(PHONE_NUM))
-        else:
-            w_i = np.random.uniform(w_Min,w_Max,(NEURON_NUM[idx+1],NEURON_NUM[idx]))
-            b_i = np.random.uniform(w_Min,w_Max,(NEURON_NUM[idx+1]))
+
+    for i in range(layer):
+        w_i = np.random.uniform(w_Min/np.sqrt(neuron[i])*3, w_Max/np.sqrt(neuron[i])*3, (neuron[i+1], neuron[i]))
+        b_i = np.random.uniform(w_Min/np.sqrt(neuron[i])*3, w_Max/np.sqrt(neuron[i])*3, neuron[i+1])
         w_List.append(w_i)
         b_List.append(b_i)
-        idx += 1
-   
+
     rList = []
     rList.append(w_List);
     rList.append(b_List);
