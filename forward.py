@@ -6,8 +6,8 @@ import math
 
 MFCC_trainFilePath = '/home/rason/MLDS_HW1_RELEASE_v1/mfcc/test'
 
-w_Min = -1
-w_Max = 1
+w_Min = -1.0
+w_Max = 1.0
 
 ###            set theano matrix dot function            ### 
 
@@ -37,19 +37,19 @@ def init(layer,neuron):
    # print 'NEURON_NUM:' + str(NEURON_NUM)
    # print 'PHONE_NUM:' + str(PHONE_NUM)
 
-	w1 = np.random.uniform(w_Min,w_Max,(NEURON_NUM[0],MFCC_DIM))
-	b1 = np.random.uniform(w_Min,w_Max,(NEURON_NUM[0]))
+	w1 = np.random.uniform(w_Min/np.sqrt(MFCC_DIM)*3,w_Max/np.sqrt(MFCC_DIM)*3,(NEURON_NUM[0],MFCC_DIM))
+	b1 = np.random.uniform(w_Min/np.sqrt(MFCC_DIM)*3,w_Max/np.sqrt(MFCC_DIM)*3,(NEURON_NUM[0]))
 	w_List.append(w1);
 	b_List.append(b1);
 	idx = 0
 	for i in range(len(NEURON_NUM)):
 		iNeuron = NEURON_NUM[i]
 	  	if i == len(NEURON_NUM) - 1:
-			w_i = np.random.uniform(w_Min,w_Max,(PHONE_NUM,iNeuron))
-			b_i = np.random.uniform(w_Min,w_Max,(PHONE_NUM))
+			w_i = np.random.uniform(w_Min/np.sqrt(iNeuron)*3,w_Max/np.sqrt(iNeuron)*3,(PHONE_NUM,iNeuron))
+			b_i = np.random.uniform(w_Min/np.sqrt(iNeuron)*3,w_Max/np.sqrt(iNeuron)*3,(PHONE_NUM))
 		else:
-			w_i = np.random.uniform(w_Min,w_Max,(NEURON_NUM[idx+1],NEURON_NUM[idx]))
-	 		b_i = np.random.uniform(w_Min,w_Max,(NEURON_NUM[idx+1]))
+			w_i = np.random.uniform(w_Min/np.sqrt(NEURON_NUM[idx])*3,w_Max/np.sqrt(NEURON_NUM[idx])*3,(NEURON_NUM[idx+1],NEURON_NUM[idx]))
+	 		b_i = np.random.uniform(w_Min/np.sqrt(NEURON_NUM[idx])*3,w_Max/np.sqrt(NEURON_NUM[idx])*3,(NEURON_NUM[idx+1]))
 		w_List.append(w_i)
 		b_List.append(b_i)
 	 	idx += 1
