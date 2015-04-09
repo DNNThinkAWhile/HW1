@@ -76,6 +76,7 @@ label_map = read_label_map(train_label_file, map_48_39_file)
 sol_map = create_sol_map(map_48_39_file, phonemes)
 
 cut_file(features_file, K)
+print_iteration = 200
 for k in range(1, K+1):
     print k, '-fold'
     cv_train_feature_file = 'train_data_' + str(k)
@@ -91,20 +92,21 @@ for k in range(1, K+1):
         print 'epoch ', epoch
 
         for i in range(iterations_epoch):
-            print 'iteration', i
+            if i % print_iteration == 0:
+                print 'epoch ', epoch, '  iteration ', i
             
             speech_ids, features, a_list, z_list = \
                 forward(cv_train_features, cv_train_speech_ids, w_and_b, batch_size, i, False)
             
             y_list = [a[-1] for a in a_list]
-            err, gradC = calculate_error(phonemes, speech_ids, y_list, label_map, error_func_cross_entropy)
+            err, gradC = calculate_error(phonemes, speech_ids, y_list, label_map, error_func_norm2)
             
-            print 'err:', err
-
+            if i % print_iteration == 0:
+                print 'err:', err
+ 
             C = backpropagate(gradC, z_list, a_list, w_and_b, features, batch_size)
             w_and_b = update(learning_rate, w_and_b[0], w_and_b[1], C)
-            
-            if i % 1000 == 0 and i > 0:
+            if i % 3000 == 0 and i > 0:
                 save_model(w_and_b, epoch, i)
                 test(cv_predict_speech_ids, cv_predict_features, w_and_b)
 
