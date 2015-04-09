@@ -19,11 +19,10 @@ def predict_outfile(speech_id, Y):
 def predict(test_file_path, theta, sol_map):
 	speech_id, mfcc_data = read_file(test_file_path)
 	y_labs = []
-	for i in range(len(speech_id)):
-		selected_speech_id, feature_set, a_list, z_list = forward(mfcc_data[i], speech_id[i], theta, len(speech_id), True)
-		y = a_list[0][-1]
-		max_idx = y.argmax(axis = 0)
-		y_labs.append(sol_map[max_idx])
+	selected_speech_id, feature_set, a_list, z_list = forward(mfcc_data, speech_id, theta, len(speech_id) ,len(speech_id), True)
+        y_list = [a[-1] for a in a_list]
+	max_idx = [y.argmax(axis = 0) for y in y_list ]
+	y_labs = [ sol_map[idx] for idx in max_idx ]
 		# if speech_id != selected_speech_id:
 		#     print 'warning! debug!'
 	return speech_id, y_labs

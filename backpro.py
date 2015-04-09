@@ -29,7 +29,16 @@ backpro_2vectorDotA = T.dvector('backpro_2vectorDotA')
 backpro_2vectorDotB = T.dvector('backpro_2vectorDotB')
 func2vectorDot = function([backpro_2vectorDotA, backpro_2vectorDotB], backpro_2vectorDotA*backpro_2vectorDotB)
 
-backpro_dotMatrixA = T.dmatrix('backpro_dotMatrixA') 
+#funcCalLum = func2vectorDot(A,funcDot(B,C))     func2vectorDot : two vector element wise multiply  ;  funcDot : matrix dot vector (matrix multiply) 
+backpro_calLum_z = T.dvector('backpro_calLum_z')
+backpro_calLum_WT = T.dmatrix('backpro_calLum_WT')
+backpro_calLum_nextLum = T.dvector('backpro_calLum_nextLum')
+backpro_calLum_zSig = 1/(T.exp((-1)*backpro_calLum_z)+1)
+backpro_calLum_zSigGrad = backpro_calLum_zSig*(1-backpro_calLum_zSig)
+backpro_Lum = backpro_calLum_zSigGrad * T.dot(backpro_calLum_WT, backpro_calLum_nextLum)
+funcCalLum = function([backpro_calLum_z, backpro_calLum_WT, backpro_calLum_nextLum],  backpro_Lum)
+
+backpro_dotMatrixA = T.dmatrix('backpro_dotMatrixA')
 backpro_dotMatrixB = T.dmatrix('backpro_dotMatrixB') 
 backpro_2MatrixDotAns = T.dot(backpro_dotMatrixA, backpro_dotMatrixB)
 func2MatrixDot = function([backpro_dotMatrixA, backpro_dotMatrixB], backpro_2MatrixDotAns)
@@ -64,44 +73,25 @@ def backpropagate (gradC = np.zeros(1) , z  = [],  a = [] , theta = [], features
 		lum = [None] * (layer)
 		for i in range(layer-1 , -1, -1):
 			if i == layer -1:
-                                #lum[i] = funcSigmoid(z[j][i-1]) * gradC
 				lum[i] = funcMultiply(funcSigmoidGrad(z[j][i]), gradC)
 				if i != 0 :
 					WC[i] = func2MatrixDot( np.matrix(lum[i]).transpose() , np.matrix(a[j][i-1]) )
-                                        #WC[i] = funcMultiply(a[j][i-1], lum[i])
 				else :
 					WC[i] = func2MatrixDot( np.matrix(lum[i]).transpose() , np.matrix(featureset[j]) )
-					#WC[i] = funcMultiply(featureset[j], lum[i])
 				if j == 0:
-					#print 'i=' + str(i) 
 					finalWC[i] = WC[i]
 					finallum[i] = lum[i]
 				else:
-					#print j,':',np.shape(C[(layer-i-1)*2])
-					#print np.shape(WC[i])
 					finalWC[i] = func2MatrixAdd(finalWC[i], WC[i])
-					#C[(layer-i-1) * 2] = func2MatrixAdd(C[(layer-i-1) * 2], WC[i])
 					finallum[i] = funcAdd(finallum[i], lum[i])
-					#C[(layer-i-1) * 2 + 1] = funcAdd(C[(layer-i-1)*2 + 1], lum[i])
 			else:
-				# print 'sigz shape ' + str(sig(z[j][i]).shape)
-				# print 'wt shape ' + str(WT[i+1].shape)
-				# print 'lum shape ' + str(lum[i - 1].shape)
-				#print 'i=' + str(i)
-				
 				if i != 0 :
-                                        #lum[i] = (funcSigmoidGrad(z[j][i-1]) * WT[i].transpose()).transpose().dot(lum[i+1])
-                                        #lum[i] = funcMatrixMulti(funcSigmoidGrad(z[j][i-1]), WT[i].transpose()).transpose().dot(lum[i+1])
-                                        toDot = funcDot(WT[i+1], lum[i+1])
-                                        lum[i] = func2vectorDot(funcSigmoidGrad(z[j][i]),toDot)
-					#WC[i] = funcMultiply(a[j][i-1], lum[i])
+                                        #lum[i] = funcCalLum(z[j][i], WT[i+1], lum[i+1])
+                                        lum[i] = func2vectorDot(funcSigmoidGrad(z[j][i]),funcDot(WT[i+1], lum[i+1]))
 					WC[i] = func2MatrixDot( np.matrix(lum[i]).transpose() , np.matrix(a[j][i-1]) )
 				else :
-                                        #lum[i] = (featureset[j]*WT[i].transpose()).transpose().dot(lum[i+1])
-                                        #toDot = funcMatrixMulti(funcSigmoidGrad(z[j][i]), WT[i+1])
+                                        #lum[i] = funcCalLum(z[j][i], WT[i+1], lum[i+1])
                                         lum[i] = func2vectorDot(funcSigmoidGrad(z[j][i]),funcDot(WT[i+1], lum[i+1]))
-                                        #lum[i] = funcDot(toDot, lum[i+1])
-					#WC[i] = funcMultiply(featureset[j], lum[i])
 					WC[i] = func2MatrixDot( np.matrix(lum[i]).transpose() , np.matrix(featureset[j]) )
 				if j == 0 :
 					finalWC[i] = WC[i]

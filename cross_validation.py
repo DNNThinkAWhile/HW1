@@ -20,7 +20,7 @@ def cut_file(orig_data_path, K):
     with open(orig_data_path, 'r') as f:
         orig_data = f.readlines()
     num_lines = sum(1 for line in orig_data)
-    for k in range(K):
+    for k in range(1):
         #test_cnt = 0;
         train_outfile = open('train_data_'+str(k+1), 'w')
         test_outfile = open('test_data_'+str(k+1), 'w')
@@ -104,7 +104,7 @@ for k in range(1, K+1):
             C = backpropagate(gradC, z_list, a_list, w_and_b, features, batch_size)
             w_and_b = update(learning_rate, w_and_b[0], w_and_b[1], C)
             
-            if i % 1000 == 0 and i > 0:
+            if i % 3000 == 0 and i > 0:
                 save_model(w_and_b, epoch, i)
                 test(cv_predict_speech_ids, cv_predict_features, w_and_b)
 
