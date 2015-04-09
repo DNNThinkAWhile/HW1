@@ -5,10 +5,10 @@ def save_model(theta, epoch, iteration):
     save_model_path = 'model_' + str(epoch) + '_' + str(iteration)
     np.save(save_model_path, theta)
 
-def update(learning_rate, W, B, C):
+def update(learning_rate, W, B, C, namda, n):
     layer = len(W)
     for l in range(layer):
-        W[l] -= learning_rate*C[0][l]
+        W[l] = (1 - (namda*learning_rate)/n)*W[l] - learning_rate*C[0][l]
         B[l] -= learning_rate*C[1][l]
     theta_log = '''
     ++ W weighting matrix ++

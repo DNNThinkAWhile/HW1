@@ -8,13 +8,7 @@ def calculate_error(phoneme_num, label_48_list, vy_48_list, labelmap, error_func
 	
 	err_total = 0
 	errd_total = np.zeros(phoneme_num)
-        K = 0
-        for W in WList:
-            for x in np.nditer(W):
-                K += x*x
-
-
-        regularization = (namda*K)/(2*n)
+        regu = 0.5*(namda/n)*sum(np.linalg.norm(w)**2 for w in WList)
 	for i in range(batch_size):
 		label_idx = labelmap[label_48_list[i]]
 		vlabel = np.zeros(phoneme_num)
@@ -23,8 +17,8 @@ def calculate_error(phoneme_num, label_48_list, vy_48_list, labelmap, error_func
 		err, errd = error_func(vlabel, vy_48_list[i])
 		err_total += err
 		errd_total += errd
-	return np.nan_to_num(err_total / float(batch_size))+regularization,\
-               np.nan_to_num(errd_total / float(batch_size))+regularization
+	return np.nan_to_num(err_total / float(batch_size))+regu,\
+               np.nan_to_num(errd_total / float(batch_size))
 
 
 # theano_ function for error_func_norm2
@@ -49,7 +43,8 @@ _ce_cross_h_grad = function([_ce_x, _ce_y], T.grad(_ce_z, _ce_y), allow_input_do
 
 
 def error_func_cross_entropy(v_lab, v_pred):
-	return _ce_cross_h(v_lab, v_pred), _ce_cross_h_grad(v_lab, v_pred)
+        return np.sum(np.nan_to_num(-v_pred*np.log(v_lab)-(1-v_pred)*np.log(1-v_lab)))
+	#return _ce_cross_h(v_lab, v_pred), _ce_cross_h_grad(v_lab, v_pred)
 
 def get_answer(phonemes, speech_id, predict_y_labels, label_map, sol_map):
     valid_answer = []

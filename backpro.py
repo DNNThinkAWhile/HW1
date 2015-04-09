@@ -59,6 +59,7 @@ def backpropagate (gradC = np.zeros(1) , z  = [],  a = [] , theta = [], features
 	finalWC = [None] * (layer)
 	finallum = [None] * (layer)
 
+
 	for j in range(batchsize):
 		WC = [None] * (layer)
 		lum = [None] * (layer)

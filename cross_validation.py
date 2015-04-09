@@ -91,21 +91,24 @@ for k in range(1, K+1):
         print 'epoch ', epoch
 
         for i in range(iterations_epoch):
-            print 'iteration', i
+            if (i % 100 == 0):
+                print 'iteration', i
             
             speech_ids, features, a_list, z_list = \
                 forward(cv_train_features, cv_train_speech_ids, w_and_b, batch_size, i, False)
             
             y_list = [a[-1] for a in a_list]
             err, gradC = calculate_error(phonemes, speech_ids, y_list, label_map, error_func_norm2, namda, len(cv_train_features), w_and_b[0])
-            
-            print 'err:', err
+            if (i % 100 == 0):
+                print 'err:', err
 
             C = backpropagate(gradC, z_list, a_list, w_and_b, features, batch_size)
-            w_and_b = update(learning_rate, w_and_b[0], w_and_b[1], C)
+            w_and_b = update(learning_rate, w_and_b[0], w_and_b[1], C, namda, len(cv_train_features))
             
             if i % 1000 == 0 and i > 0:
+                print 'model saved' 
                 save_model(w_and_b, epoch, i)
+                print 'start predicting'
                 test(cv_predict_speech_ids, cv_predict_features, w_and_b)
 
     print '------------------------------------'
