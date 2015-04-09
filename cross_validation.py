@@ -12,6 +12,7 @@ from calculate_error import *   # read_label_map(), calculate_error()
 from update import *            # update(), save_model()
 from predict import *           # load_model(), create_sol_map()
 from dnn import *
+import time
 
 TEST_NUM = 10000;
 
@@ -37,12 +38,12 @@ def score(speech_ids, y, label_map):
     fp = 0
     fn = 0
     
-def test(pred_speech_ids, pred_features, theta):
+def test(dnn, pred_speech_ids, pred_features):
     num = len(pred_speech_ids)
     a_list = [None] * num
     z_list = [None] * num
     for i in range(num):
-        a, z = forward(pred_features[i], pred_speech_ids[i], theta)
+        a, z = dnn.forward(pred_features[i], pred_speech_ids[i])
         a_list[i] = a
         z_list[i] = z
     predict_y_labels = [a[-1] for a in a_list]
@@ -97,26 +98,27 @@ for k in range(1, K+1):
     iterations_epoch = train_size / batch_size
     for epoch in range(max_epoch):
         print 'epoch ', epoch
+        st = time.time()
 
         for i in range(iterations_epoch):
-            print 'iteration', i
-            d_w, d_b = dnn.train(cv_train_speech_ids, cv_train_features, batch_size, i, phonemes, label_map, error_func_norm2, learning_rate)
+            
+            
+            d_w, d_b, err = dnn.train(cv_train_speech_ids, cv_train_features, batch_size, i, phonemes, label_map, error_func_norm2, learning_rate)
 
+            if i % 300 == 0:
+                print 'iteration', i
             # print 'd_w[0]', d_w[0].shape
             # print 'd_w[1]', d_w[1].shape
 
             # print 'd_b[0]', d_b[0].shape
             # print 'd_b[1]', d_b[1].shape
 
-
             dnn.update(learning_rate, (d_w, d_b))
 
-            if i == 500:
-                exit(0)
-
-            if i % 1000 == 0 and i > 0:
-                save_model(dnn.theta, epoch, i)
-                test(cv_predict_speech_ids, cv_predict_features, theta)
+        print 'epoch ', i, ' finished in ', time.time() - st, ' seconds'
+        print 'testing...'        
+        save_model(dnn.theta, epoch, i)
+        test(dnn, cv_predict_speech_ids, cv_predict_features)
 
     print '------------------------------------'
     # cv_predict_speech_ids, cv_predict_features = read_file(cv_predict_feature_file)

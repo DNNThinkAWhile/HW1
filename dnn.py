@@ -286,7 +286,7 @@ class Dnn():
             self.theta[0][l] -= learning_rate*C[0][l]
             self.theta[1][l] -= learning_rate*C[1][l]
         
-        
+
         # theta_log = '''
         # ++ W weighting matrix ++
         # W:       
@@ -329,7 +329,7 @@ class Dnn():
         # a = np.mean(d_w_all, axis=0)
         # print 'd_b_all ', d_b_all
         # b = np.mean(d_b_all, axis=0)
-        return np.mean(d_w_all, axis=0), np.mean(d_b_all, axis=0)
+        return np.mean(d_w_all, axis=0), np.mean(d_b_all, axis=0), err
 
 
 
