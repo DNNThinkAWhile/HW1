@@ -115,11 +115,12 @@ for k in range(1, K+1):
 
             dnn.update(learning_rate, (d_w, d_b))
 
-        print 'epoch ', i, ' finished in ', time.time() - st, ' seconds'
-        print 'testing...'        
-        save_model(dnn.theta, epoch, i)
-        test(dnn, cv_predict_speech_ids, cv_predict_features)
+            if i % 1000 == 0 and i > 0:       
+                print 'testing...'        
+                save_model(dnn.theta, epoch, i)
+                test(dnn, cv_predict_speech_ids, cv_predict_features)
 
+        print 'epoch ', i, ' finished in ', time.time() - st, ' seconds'
     print '------------------------------------'
     # cv_predict_speech_ids, cv_predict_features = read_file(cv_predict_feature_file)
     # speech_ids, features, a_list, z_list = forward(cv_predict_features, cv_predict_speech_ids, w_and_b, len(cv_predict_speech_ids), True)
