@@ -38,11 +38,6 @@ def init(layer,neuron):
    # print 'NEURON_NUM:' + str(NEURON_NUM)
    # print 'PHONE_NUM:' + str(PHONE_NUM)
 
-    w1 = np.random.uniform(w_Min,w_Max,(NEURON_NUM[0],MFCC_DIM))
-    b1 = np.random.uniform(w_Min,w_Max,(NEURON_NUM[0]))
-    w_List.append(w1);
-    b_List.append(b1);
-
     for i in range(layer):
         w_i = np.random.uniform(w_Min/np.sqrt(neuron[i])*3, w_Max/np.sqrt(neuron[i])*3, (neuron[i+1], neuron[i]))
         b_i = np.random.uniform(w_Min/np.sqrt(neuron[i])*3, w_Max/np.sqrt(neuron[i])*3, neuron[i+1])
