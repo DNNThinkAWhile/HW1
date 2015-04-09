@@ -106,7 +106,7 @@ for k in range(1, K+1):
             d_w, d_b, err = dnn.train(cv_train_speech_ids, cv_train_features, batch_size, i, phonemes, label_map, error_func_norm2, learning_rate)
 
             if i % 300 == 0:
-                print 'iteration', i
+                print 'iteration', i, ' err ', err
             # print 'd_w[0]', d_w[0].shape
             # print 'd_w[1]', d_w[1].shape
 
