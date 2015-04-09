@@ -35,8 +35,6 @@ def init(layer,neuron):
         for i in range(layer):
             w_i = np.random.uniform(w_Min/np.sqrt(neuron[i])*3, w_Max/np.sqrt(neuron[i])*3, (neuron[i+1], neuron[i]))
             b_i = np.random.uniform(w_Min/np.sqrt(neuron[i])*3, w_Max/np.sqrt(neuron[i])*3, neuron[i+1])
-            print 'w_i', w_i
-            print 'b_i', b_i
             w_List.append(w_i)
             b_List.append(b_i)
    

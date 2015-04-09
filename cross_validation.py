@@ -11,7 +11,7 @@ from calculate_error import *   # read_label_map(), calculate_error()
 from backpro import *           # backpropagation()
 from update import *            # update(), save_model()
 from predict import *           # load_model(), create_sol_map()
-
+import time
 TEST_NUM = 10000;
 
 # K-FOLD CROSS-VALIDATION 
@@ -89,9 +89,9 @@ for k in range(1, K+1):
     iterations_epoch = train_size / batch_size
     for epoch in range(max_epoch):
         print 'epoch ', epoch
-
+        st = time.time()
         for i in range(iterations_epoch):
-            print 'iteration', i
+            
             
             speech_ids, features, a_list, z_list = \
                 forward(cv_train_features, cv_train_speech_ids, w_and_b, batch_size, i, False)
@@ -99,7 +99,8 @@ for k in range(1, K+1):
             y_list = [a[-1] for a in a_list]
             err, gradC = calculate_error(phonemes, speech_ids, y_list, label_map, error_func_cross_entropy)
             
-            print 'err:', err
+            if i % 300 == 0:
+                print 'iteration', i, 'err:', err
 
             C = backpropagate(gradC, z_list, a_list, w_and_b, features, batch_size)
             w_and_b = update(learning_rate, w_and_b[0], w_and_b[1], C)
@@ -107,7 +108,7 @@ for k in range(1, K+1):
             if i % 3000 == 0 and i > 0:
                 save_model(w_and_b, epoch, i)
                 test(cv_predict_speech_ids, cv_predict_features, w_and_b)
-
+        print 'epoch ', epoch, '  toke ', time.time() - st, ' seconds'
     print '------------------------------------'
     # cv_predict_speech_ids, cv_predict_features = read_file(cv_predict_feature_file)
     # speech_ids, features, a_list, z_list = forward(cv_predict_features, cv_predict_speech_ids, w_and_b, len(cv_predict_speech_ids), True)
