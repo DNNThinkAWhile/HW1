@@ -24,8 +24,6 @@ def predict(test_file_path, theta, sol_map):
 		y = a_list[0][-1]
 		max_idx = y.argmax(axis = 0)
 		y_labs.append(sol_map[max_idx])
-		# if speech_id != selected_speech_id:
-		#     print 'warning! debug!'
 	return speech_id, y_labs
 
 def create_sol_map(map_48_39_file, labelnum):
