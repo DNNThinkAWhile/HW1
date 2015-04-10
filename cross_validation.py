@@ -81,9 +81,9 @@ w_and_b = init(layer, neuron)
 label_map = read_label_map(train_label_file, map_48_39_file)
 sol_map = create_sol_map(map_48_39_file, phonemes)
 
-cut_file(features_file, K)
+#cut_file(features_file, K)
 
-dnn = Dnn(w_and_b)
+dnn = Dnn(w_and_b, batch_size)
 
 for k in range(1, K+1):
     print k, '-fold'
@@ -115,12 +115,13 @@ for k in range(1, K+1):
 
             dnn.update(learning_rate, (d_w, d_b))
 
-            if i % 1000 == 0 and i > 0:       
-                print 'testing...'        
-                save_model(dnn.theta, epoch, i)
-                test(dnn, cv_predict_speech_ids, cv_predict_features)
-
+#        if i % 3000 == 0 and i > 0:       
         print 'epoch ', i, ' finished in ', time.time() - st, ' seconds'
+        print 'testing...'        
+        save_model(dnn.theta, epoch, i)
+        test(dnn, cv_predict_speech_ids, cv_predict_features)
+
+        
     print '------------------------------------'
     # cv_predict_speech_ids, cv_predict_features = read_file(cv_predict_feature_file)
     # speech_ids, features, a_list, z_list = forward(cv_predict_features, cv_predict_speech_ids, w_and_b, len(cv_predict_speech_ids), True)

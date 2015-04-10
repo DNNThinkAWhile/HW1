@@ -210,7 +210,7 @@ def numpy_sigmoid_grad(vec):
 
 
 class Dnn():
-    def __init__(self, theta):
+    def __init__(self, theta, batch_size):
         self.theta = theta
         w = theta[0]
         b = theta[1]
@@ -221,6 +221,13 @@ class Dnn():
             self.wc[i] = np.matrix(np.empty((w[i].shape)))
             self.lum[i] = np.empty((b[i].shape))
 
+        # for back_batch
+        self.wc_b = [None] * (self.layer_num)
+        self.lum_b = [None] * (self.layer_num)
+        self.batch_size = batch_size
+        for i in range(self.layer_num):
+            self.wc_b[i] = np.empty((w[i].shape))#np.matrix(np.empty((w[i].shape)))
+            self.lum_b[i] = np.empty((b[i].shape[0], self.batch_size))
 
 
     def backprop(self, grad_c, z, a, feat):
@@ -254,6 +261,50 @@ class Dnn():
                 np.dot(np.matrix(lum[i]).transpose(), np.matrix(feat), wc[i])
         return wc, lum
 
+    def backprop_batch(self, grad_c_b, z_b, a_b, feats_b, batch_size):
+        w = self.theta[0]    
+        b = self.theta[1]
+        layer_num = self.layer_num
+        wc_b = self.wc_b
+        lum_b = self.lum_b
+        lum = self.lum
+        
+        wt = []
+        for i in range(layer_num):
+            wt.append(np.transpose(w[i]))
+
+        #z_b = numpy_sigmoid_grad(z_b)
+        
+        for i in range(layer_num - 1, -1, -1):
+            vs_right = np.empty(lum_b[i].shape)
+            if i == layer_num - 1:
+                vs_right = grad_c_b
+            else:
+                # print 'i ', i
+                # print 'a ', wt[i+1].shape
+                # print 'b ', lum_b[i+1].shape
+                # print 'c ', vs_right.shape
+                np.dot(wt[i+1], lum_b[i+1], vs_right)
+
+            np.multiply(numpy_sigmoid_grad(z_b[i]), vs_right, lum_b[i])
+
+            if i > 0:
+                # print 'aaa' ,lum_b[i].shape
+                # print 'bbb', a_b[i-1].transpose().shape
+                # print 'ccc', wc_b[i].shape
+                np.dot(lum_b[i], a_b[i-1].transpose(), wc_b[i])
+            else:
+                # print 'ddddd'
+                # print 'aaa' ,lum_b[i].shape
+                # print 'bbb', feats_b.shape
+                # print 'ccc', wc_b[i].shape
+                np.dot(lum_b[i], feats_b.transpose(), wc_b[i])
+
+            wc_b[i] /= batch_size
+            lum[i] = np.mean(lum_b[i], axis=1)
+        return wc_b, lum
+
+
     def forward(self, feat, spch_id):
         w = self.theta[0]
         b = self.theta[1]
@@ -267,6 +318,25 @@ class Dnn():
             a_layer = sigmoid(z_layer)
             a.append(a_layer)
         return a, z
+
+
+    def forward_batch(self, feats_b, batch_size):
+        w = self.theta[0]
+        b = self.theta[1]
+        layer_num = self.layer_num
+        a_b = []
+        z_b = []
+        a_layer = feats_b
+        for l in range(0,layer_num,1):
+            #z_layer = f_matrix_dot(w[l], a_layer , b[l])
+            z_layer = np.dot(w[l], a_layer)
+            for i in range(batch_size):
+                z_layer[:,i] += b[l]
+            z_b.append(z_layer)
+            #a_layer = sigmoid(z_layer)
+            a_layer = 1 / (np.exp((-1) * z_layer) + 1)
+            a_b.append(a_layer)
+        return a_b, z_b        
 
 
     def update(self, learning_rate, C):
@@ -296,18 +366,59 @@ class Dnn():
         d_w_all = [None] * batch_size
         d_b_all = [None] * batch_size
 
+        # for back_batch
+        layer_num = self.layer_num
+        w = self.theta[0]
+        b = self.theta[1]
+        
+        z_b = [None] * layer_num
+        a_b = [None] * layer_num
+        #feats_b = np.empty((w[0].shape[1], batch_size))
+        feats_b = np.array(feats_part).transpose()
+        grad_c_b = np.empty((w[-1].shape[0], batch_size))
+        for i in range(self.layer_num):
+            z_b[i] = np.empty((w[i].shape[0], batch_size))
+            a_b[i] = np.empty((w[i].shape[0], batch_size))
+
+        a_b,z_b = self.forward_batch(feats_b, batch_size)
+
+        err_total = 0
+
+        y_list = []
+        for i in range(batch_size):
+            y_list.append(a_b[-1][:,i])
+
+        #exit(0)
         for i in range(batch_size):    
 
             spch_id = spch_ids_part[i]
-            feat = feats_part[i]
+            # feat = feats_part[i]
 
-            a, z = self.forward(feat, spch_id)
-            
-            y = a[-1]
+            # a, z = self.forward(feat, spch_id)
+
+            y = a_b[-1][:,i]
             err, grad_c = calculate_error(phoneme_num, [spch_id], [y], label_map, error_func)
 
-            (d_w_all[i], d_b_all[i]) = self.backprop(grad_c, z, a, feat)
+            # for back_batch
+            # for l in range(layer_num):
+            #     a_b[l][:,i] = a[l]
+            #     z_b[l][:,i] = z[l]
+            # feats_b[:,i] = feat
+            grad_c_b[:,i] = grad_c
+            err_total += err
+            #(d_w_all[i], d_b_all[i]) = self.backprop(grad_c, z, a, feat)
 
+        d_w, d_b = self.backprop_batch(grad_c_b, z_b, a_b, feats_b, batch_size)
+
+        # print '~~~~~~~~~~~~~~~~~~'
+        # print d_w[0].shape
+        # print d_w[1].shape
+        # print d_w[2].shape
+        # print '~~~~~~~~~~~~~~~~~~~~~~~~ '
+        # print d_b[0].shape
+        # print d_b[1].shape
+        # print d_b[2].shape
+        
             # print 'd_w_all[i] len ' , len(d_w_all[i])
             # print 'd_w_all[i][0]: ', d_w_all[i][0]
             # print 'd_w_all[i][1] shape', d_w_all[i][1].shape
@@ -318,7 +429,9 @@ class Dnn():
         # a = np.mean(d_w_all, axis=0)
         # print 'd_b_all ', d_b_all
         # b = np.mean(d_b_all, axis=0)
-        return np.mean(d_w_all, axis=0), np.mean(d_b_all, axis=0), err
+        
+        #return np.mean(d_w_all, axis=0), np.mean(d_b_all, axis=0), err
+        return d_w, d_b, err_total / batch_size
 
 
 
