@@ -11,7 +11,7 @@ def predict_outfile(speech_id, Y):
    outfile_path = 'solution.csv'
    with open(outfile_path, 'w') as csvfile:
       writer = csv.writer(csvfile)
-      writer.writerow('Id,Prediction')
+      writer.writerow(['Id', 'Prediction'])
       for idx in range(len(Y)):
          sol = [str(speech_id[idx]), str(Y[idx])]
          writer.writerow(sol)
