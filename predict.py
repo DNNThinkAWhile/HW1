@@ -44,7 +44,6 @@ def create_48_39_map(map_48_39_file):
 		for line in f:
 			toks = line.strip().split('\t')
 			d[toks[0]] = toks[1]
-	print d
 	return d
 
 def main():
