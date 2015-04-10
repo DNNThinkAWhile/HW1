@@ -22,7 +22,7 @@ def cut_file(orig_data_path, K):
     with open(orig_data_path, 'r') as f:
         orig_data = f.readlines()
     num_lines = sum(1 for line in orig_data)
-    for k in range(K):
+    for k in range(1):
         #test_cnt = 0;
         train_outfile = open('train_data_'+str(k+1), 'w')
         test_outfile = open('test_data_'+str(k+1), 'w')
@@ -101,8 +101,7 @@ for k in range(1, K+1):
         st = time.time()
 
         for i in range(iterations_epoch):
-            
-            
+
             d_w, d_b, err = dnn.train(cv_train_speech_ids, cv_train_features, batch_size, i, phonemes, label_map, error_func_norm2, learning_rate)
 
             if i % 300 == 0:
@@ -120,8 +119,7 @@ for k in range(1, K+1):
         print 'testing...'        
         save_model(dnn.theta, epoch, i)
         test(dnn, cv_predict_speech_ids, cv_predict_features)
-
-        
+        print 'epoch ', epoch, '  toke ', time.time() - st, ' seconds'
     print '------------------------------------'
     # cv_predict_speech_ids, cv_predict_features = read_file(cv_predict_feature_file)
     # speech_ids, features, a_list, z_list = forward(cv_predict_features, cv_predict_speech_ids, w_and_b, len(cv_predict_speech_ids), True)

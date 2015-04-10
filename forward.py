@@ -6,8 +6,8 @@ import math
 
 MFCC_trainFilePath = '/home/rason/MLDS_HW1_RELEASE_v1/mfcc/test'
 
-w_Min = -1
-w_Max = 1
+w_Min = -1.0
+w_Max = 1.0
 
 ###            set theano matrix dot function            ### 
 
@@ -31,28 +31,12 @@ def init(layer,neuron):
    	MFCC_DIM = neuron[0]
    	NEURON_NUM = neuron[1:-1]
    	PHONE_NUM = neuron[-1]
-   # print 'layer:' + str(layer)
-   # print 'neuron:' + str(neuron)
-   # print 'MFCC_DIM:' + str(MFCC_DIM)
-   # print 'NEURON_NUM:' + str(NEURON_NUM)
-   # print 'PHONE_NUM:' + str(PHONE_NUM)
-
-	w1 = np.random.uniform(w_Min,w_Max,(NEURON_NUM[0],MFCC_DIM))
-	b1 = np.random.uniform(w_Min,w_Max,(NEURON_NUM[0]))
-	w_List.append(w1);
-	b_List.append(b1);
-	idx = 0
-	for i in range(len(NEURON_NUM)):
-		iNeuron = NEURON_NUM[i]
-	  	if i == len(NEURON_NUM) - 1:
-			w_i = np.random.uniform(w_Min,w_Max,(PHONE_NUM,iNeuron))
-			b_i = np.random.uniform(w_Min,w_Max,(PHONE_NUM))
-		else:
-			w_i = np.random.uniform(w_Min,w_Max,(NEURON_NUM[idx+1],NEURON_NUM[idx]))
-	 		b_i = np.random.uniform(w_Min,w_Max,(NEURON_NUM[idx+1]))
-		w_List.append(w_i)
-		b_List.append(b_i)
-	 	idx += 1
+        
+        for i in range(layer):
+            w_i = np.random.uniform(w_Min/np.sqrt(neuron[i])*3, w_Max/np.sqrt(neuron[i])*3, (neuron[i+1], neuron[i]))
+            b_i = np.random.uniform(w_Min/np.sqrt(neuron[i])*3, w_Max/np.sqrt(neuron[i])*3, neuron[i+1])
+            w_List.append(w_i)
+            b_List.append(b_i)
    
 	rList = []
 	rList.append(w_List);
@@ -146,8 +130,8 @@ def forward(List2D_MFCC_data, List_speakID, WandB, BATCH_SIZE, iteration, isTest
 
 
 def main():
-   init(2,[3, 5, 6])
-   forward()
+   init(4,[39, 100, 120, 250, 48])
+   #forward()
 
    MFCC_DIM = 39
    LAYER_NUM = 5
